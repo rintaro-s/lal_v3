@@ -1,0 +1,456 @@
+2025-05-04 13:09:06,815 - __main__ - INFO - Starting knowledge distillation process
+2025-05-04 13:09:06,819 - __main__ - INFO - RAM: 使用中 12.8GB / 95.4GB (13.4%)
+2025-05-04 13:09:06,892 - __main__ - INFO - GPU 0 (NVIDIA GeForce RTX 5070 Ti): 確保 0.0GB / 予約 0.0GB / 合計 15.9GB
+2025-05-04 13:09:06,892 - __main__ - INFO - Using device: cuda
+2025-05-04 13:09:06,892 - __main__ - INFO - GPU: NVIDIA GeForce RTX 5070 Ti
+2025-05-04 13:09:06,893 - __main__ - INFO - CUDA Version: 12.8
+2025-05-04 13:09:06,893 - __main__ - INFO - GPU Memory: 15.9 GB
+2025-05-04 13:09:06,893 - __main__ - INFO - Loading tokenizer for elyza/ELYZA-Thinking-1.0-Qwen-32B
+2025-05-04 13:16:02,776 - __main__ - INFO - Starting knowledge distillation process
+2025-05-04 13:16:02,787 - __main__ - INFO - RAM: 使用中 13.7GB / 95.4GB (14.4%)
+2025-05-04 13:16:02,830 - __main__ - INFO - GPU 0 (NVIDIA GeForce RTX 5070 Ti): 確保 0.0GB / 予約 0.0GB / 合計 15.9GB
+2025-05-04 13:16:02,831 - __main__ - INFO - Using device: cuda
+2025-05-04 13:16:02,831 - __main__ - INFO - GPU: NVIDIA GeForce RTX 5070 Ti
+2025-05-04 13:16:02,832 - __main__ - INFO - CUDA Version: 12.8
+2025-05-04 13:16:02,832 - __main__ - INFO - GPU Memory: 15.9 GB
+2025-05-04 13:16:02,832 - __main__ - INFO - Loading tokenizer for elyza/ELYZA-Thinking-1.0-Qwen-32B
+2025-05-04 13:16:03,721 - __main__ - INFO - Initializing student model
+2025-05-04 13:16:04,650 - distillation - INFO - RAM使用状況: 15.5% (使用中: 14.8GB, 空き: 80.6GB)
+2025-05-04 13:16:04,651 - distillation - INFO - Loading teacher model: elyza/ELYZA-Thinking-1.0-Qwen-32B
+2025-05-04 13:16:04,651 - distillation - INFO - Configuring 4-bit quantization for teacher model
+2025-05-04 13:16:04,653 - distillation - INFO - Using automatic device mapping with CPU offloading
+2025-05-04 13:16:06,061 - distillation - ERROR - Failed to load teacher model: Failed to import transformers.models.qwen2.modeling_qwen2 because of the following error (look up to see its traceback):
+No module named 'triton'
+2025-05-04 13:29:48,824 - __main__ - INFO - Starting knowledge distillation process
+2025-05-04 13:29:48,835 - __main__ - INFO - RAM: 使用中 14.3GB / 95.4GB (15.0%)
+2025-05-04 13:29:48,836 - __main__ - INFO - Windows環境を検出しました
+2025-05-04 13:29:48,836 - __main__ - WARNING - WindowsでQwen2モデルを使用する場合はwindows_modeを推奨します
+2025-05-04 13:29:56,484 - __main__ - INFO - windows_modeを有効にしました
+2025-05-04 13:29:56,484 - __main__ - INFO - Using device: cpu
+2025-05-04 13:29:56,485 - __main__ - INFO - Loading tokenizer for elyza/ELYZA-Thinking-1.0-Qwen-32B
+2025-05-04 13:29:56,978 - __main__ - INFO - Initializing student model
+2025-05-04 13:29:57,810 - distillation - INFO - RAM使用状況: 16.0% (使用中: 15.2GB, 空き: 80.2GB)
+2025-05-04 13:29:57,811 - distillation - INFO - Loading teacher model: elyza/ELYZA-Thinking-1.0-Qwen-32B
+2025-05-04 13:29:57,812 - distillation - INFO - Windows互換モードで実行しています
+2025-05-04 13:29:57,869 - xformers - WARNING - WARNING[XFORMERS]: xFormers can't load C++/CUDA extensions. xFormers was built for:
+    PyTorch 2.6.0+cu124 with CUDA 1204 (you have 2.6.0+cpu)
+    Python  3.10.11 (you have 3.10.6)
+  Please reinstall xformers (see https://github.com/facebookresearch/xformers#installing-xformers)
+  Memory-efficient attention, SwiGLU, sparse and more won't be available.
+  Set XFORMERS_MORE_DETAILS=1 for more details
+2025-05-04 13:30:01,264 - distillation - INFO - xformersが使用可能です
+2025-05-04 13:30:01,265 - distillation - INFO - Configuring 4-bit quantization for teacher model
+2025-05-04 13:30:01,273 - distillation - INFO - Using automatic device mapping with CPU offloading
+2025-05-04 13:30:01,274 - distillation - INFO - Qwen2モデル用にxformersでパフォーマンス最適化
+2025-05-04 13:30:02,057 - distillation - ERROR - Failed to load teacher model: Failed to import transformers.models.qwen2.modeling_qwen2 because of the following error (look up to see its traceback):
+operator torchvision::nms does not exist
+2025-05-04 13:30:02,058 - __main__ - ERROR - Error initializing distiller with elyza/ELYZA-Thinking-1.0-Qwen-32B: Failed to import transformers.models.qwen2.modeling_qwen2 because of the following error (look up to see its traceback):
+operator torchvision::nms does not exist
+2025-05-04 13:42:02,715 - __main__ - INFO - Starting knowledge distillation process
+2025-05-04 13:42:02,720 - __main__ - INFO - RAM: 使用中 14.7GB / 95.4GB (15.4%)
+2025-05-04 13:42:02,789 - __main__ - INFO - GPU 0 (NVIDIA GeForce RTX 5070 Ti): 確保 0.0GB / 予約 0.0GB / 合計 15.9GB
+2025-05-04 13:42:02,789 - __main__ - INFO - Windows環境を検出しました
+2025-05-04 13:42:02,790 - __main__ - WARNING - WindowsでQwen2モデルを使用する場合はwindows_modeを推奨します
+2025-05-04 13:42:20,169 - __main__ - INFO - windows_modeを有効にしました
+2025-05-04 13:42:20,169 - __main__ - INFO - PyTorch nightly版を検出: 2.7.0.dev20250309+cu128
+2025-05-04 13:42:20,169 - __main__ - WARNING - PyTorch nightly版ではGPU最適化ライブラリが使用できない場合があります
+2025-05-04 13:42:20,170 - __main__ - INFO - --use_direct_gpu オプションを使用することを推奨します
+2025-05-04 13:42:23,020 - __main__ - INFO - Using device: cuda
+2025-05-04 13:42:23,020 - __main__ - INFO - GPU: NVIDIA GeForce RTX 5070 Ti
+2025-05-04 13:42:23,020 - __main__ - INFO - CUDA Version: 12.8
+2025-05-04 13:42:23,020 - __main__ - INFO - GPU Memory: 15.9 GB
+2025-05-04 13:42:23,020 - __main__ - INFO - Loading tokenizer for elyza/ELYZA-Thinking-1.0-Qwen-32B
+2025-05-04 13:42:24,009 - __main__ - INFO - Initializing student model
+2025-05-04 13:42:24,888 - distillation - INFO - PyTorch nightly版を検出: 2.7.0.dev20250309+cu128
+2025-05-04 13:42:24,899 - distillation - INFO - RAM使用状況: 16.4% (使用中: 15.6GB, 空き: 79.8GB)
+2025-05-04 13:42:24,900 - distillation - INFO - Loading teacher model: elyza/ELYZA-Thinking-1.0-Qwen-32B
+2025-05-04 13:42:24,900 - distillation - INFO - GPU直接アクセスモードで実行します（最適化ライブラリ未使用）
+2025-05-04 13:42:24,906 - distillation - INFO - Windows互換モードで実行しています
+2025-05-04 13:42:29,070 - distillation - INFO - xformersが使用可能です
+2025-05-04 13:42:29,071 - distillation - INFO - Configuring 4-bit quantization for teacher model
+2025-05-04 13:42:29,080 - distillation - INFO - Using automatic device mapping with CPU offloading
+2025-05-04 13:42:29,513 - distillation - ERROR - Failed to load teacher model: Failed to import transformers.models.qwen2.modeling_qwen2 because of the following error (look up to see its traceback):
+No module named 'triton'
+2025-05-04 13:42:29,513 - distillation - ERROR - tritonモジュールが見つかりません。PyTorch nightlyを使用している可能性があります。
+2025-05-04 13:42:29,514 - distillation - INFO - --use_direct_gpu オプションを使用するか、別のモデルを選択してください。
+2025-05-04 13:42:29,515 - distillation - INFO - 以下のモデルはWindows環境でも動作します:
+2025-05-04 13:42:29,515 - distillation - INFO - 1. elyza/elyza-japanese-llama-2-7b
+2025-05-04 13:42:29,516 - distillation - INFO - 2. stabilityai/stablelm-base-alpha-7b
+2025-05-04 13:42:29,517 - distillation - INFO - 3. cyberagent/calm2-7b
+2025-05-04 13:42:59,736 - __main__ - ERROR - Error initializing distiller with elyza/ELYZA-Thinking-1.0-Qwen-32B: Failed to import transformers.models.qwen2.modeling_qwen2 because of the following error (look up to see its traceback):
+No module named 'triton'
+2025-05-04 13:42:59,736 - __main__ - ERROR - triton または flash-attn モジュールがインストールされていません
+2025-05-04 13:42:59,736 - __main__ - INFO - 必要なパッケージをインストールするか、代替モデルを使用してください
+2025-05-04 13:43:05,919 - __main__ - INFO - 代替の教師モデルを使用するか、--use_cpu_only オプションを使用してみてください
+2025-05-04 13:43:05,920 - __main__ - INFO - 代替モデルの候補:
+2025-05-04 13:43:05,920 - __main__ - INFO - 1. elyza/elyza-japanese-llama-2-7b
+2025-05-04 13:43:05,920 - __main__ - INFO - 2. meta-llama/Llama-2-7b-hf
+2025-05-04 13:43:05,920 - __main__ - INFO - 3. stabilityai/stablelm-base-alpha-7b
+2025-05-04 13:43:16,861 - __main__ - INFO - Starting knowledge distillation process
+2025-05-04 13:43:16,867 - __main__ - INFO - RAM: 使用中 14.6GB / 95.4GB (15.3%)
+2025-05-04 13:43:16,926 - __main__ - INFO - GPU 0 (NVIDIA GeForce RTX 5070 Ti): 確保 0.0GB / 予約 0.0GB / 合計 15.9GB
+2025-05-04 13:43:16,926 - __main__ - INFO - Windows環境を検出しました
+2025-05-04 13:43:16,927 - __main__ - WARNING - WindowsでQwen2モデルを使用する場合はwindows_modeを推奨します
+2025-05-04 13:43:19,199 - __main__ - INFO - windows_modeを有効にしました
+2025-05-04 13:43:19,199 - __main__ - INFO - PyTorch nightly版を検出: 2.7.0.dev20250309+cu128
+2025-05-04 13:43:19,199 - __main__ - INFO - Using device: cuda
+2025-05-04 13:43:19,200 - __main__ - INFO - GPU: NVIDIA GeForce RTX 5070 Ti
+2025-05-04 13:43:19,200 - __main__ - INFO - CUDA Version: 12.8
+2025-05-04 13:43:19,200 - __main__ - INFO - GPU Memory: 15.9 GB
+2025-05-04 13:43:19,200 - __main__ - INFO - Loading tokenizer for elyza/ELYZA-Thinking-1.0-Qwen-32B
+2025-05-04 13:43:19,709 - __main__ - INFO - Initializing student model
+2025-05-04 13:43:20,576 - distillation - INFO - PyTorch nightly版を検出: 2.7.0.dev20250309+cu128
+2025-05-04 13:43:20,580 - distillation - INFO - RAM使用状況: 16.4% (使用中: 15.6GB, 空き: 79.7GB)
+2025-05-04 13:43:20,580 - distillation - INFO - Loading teacher model: elyza/ELYZA-Thinking-1.0-Qwen-32B
+2025-05-04 13:43:20,581 - distillation - INFO - GPU直接アクセスモードで実行します（最適化ライブラリ未使用）
+2025-05-04 13:43:20,581 - distillation - INFO - Windows互換モードで実行しています
+2025-05-04 13:43:21,804 - distillation - INFO - xformersが使用可能です
+2025-05-04 13:43:21,804 - distillation - INFO - Configuring 4-bit quantization for teacher model
+2025-05-04 13:43:21,810 - distillation - INFO - Using automatic device mapping with CPU offloading
+2025-05-04 13:43:22,202 - distillation - ERROR - Failed to load teacher model: Failed to import transformers.models.qwen2.modeling_qwen2 because of the following error (look up to see its traceback):
+No module named 'triton'
+2025-05-04 13:43:22,202 - distillation - ERROR - tritonモジュールが見つかりません。PyTorch nightlyを使用している可能性があります。
+2025-05-04 13:43:22,203 - distillation - INFO - --use_direct_gpu オプションを使用するか、別のモデルを選択してください。
+2025-05-04 13:43:22,203 - distillation - INFO - 以下のモデルはWindows環境でも動作します:
+2025-05-04 13:43:22,204 - distillation - INFO - 1. elyza/elyza-japanese-llama-2-7b
+2025-05-04 13:43:22,204 - distillation - INFO - 2. stabilityai/stablelm-base-alpha-7b
+2025-05-04 13:43:22,204 - distillation - INFO - 3. cyberagent/calm2-7b
+2025-05-04 13:45:59,750 - __main__ - ERROR - Error initializing distiller with elyza/ELYZA-Thinking-1.0-Qwen-32B: Failed to import transformers.models.qwen2.modeling_qwen2 because of the following error (look up to see its traceback):
+No module named 'triton'
+2025-05-04 13:45:59,751 - __main__ - ERROR - triton または flash-attn モジュールがインストールされていません
+2025-05-04 13:45:59,751 - __main__ - INFO - 必要なパッケージをインストールするか、代替モデルを使用してください
+2025-05-04 13:46:01,458 - __main__ - INFO - 代替の教師モデルを使用するか、--use_cpu_only オプションを使用してみてください
+2025-05-04 13:46:01,458 - __main__ - INFO - 代替モデルの候補:
+2025-05-04 13:46:01,458 - __main__ - INFO - 1. elyza/elyza-japanese-llama-2-7b
+2025-05-04 13:46:01,458 - __main__ - INFO - 2. meta-llama/Llama-2-7b-hf
+2025-05-04 13:46:01,458 - __main__ - INFO - 3. stabilityai/stablelm-base-alpha-7b
+2025-05-04 13:54:20,894 - __main__ - INFO - Starting knowledge distillation process
+2025-05-04 13:54:20,898 - __main__ - INFO - RAM: 使用中 15.5GB / 95.4GB (16.2%)
+2025-05-04 13:54:20,925 - __main__ - INFO - GPU 0 (NVIDIA GeForce RTX 5070 Ti): 確保 0.0GB / 予約 0.0GB / 合計 15.9GB
+2025-05-04 13:54:20,925 - __main__ - INFO - Windows環境を検出しました
+2025-05-04 13:54:20,926 - __main__ - WARNING - WindowsでQwen2モデルを使用する場合はwindows_modeを推奨します
+2025-05-04 13:54:34,799 - __main__ - INFO - windows_modeを有効にしました
+2025-05-04 13:54:34,799 - __main__ - INFO - PyTorch nightly版を検出: 2.7.0.dev20250309+cu128
+2025-05-04 13:54:34,799 - __main__ - INFO - Using device: cuda
+2025-05-04 13:54:34,800 - __main__ - INFO - GPU: NVIDIA GeForce RTX 5070 Ti
+2025-05-04 13:54:34,800 - __main__ - INFO - CUDA Version: 12.8
+2025-05-04 13:54:34,800 - __main__ - INFO - GPU Memory: 15.9 GB
+2025-05-04 13:54:34,800 - __main__ - INFO - Loading tokenizer for elyza/ELYZA-Thinking-1.0-Qwen-32B
+2025-05-04 13:54:35,492 - __main__ - INFO - Initializing student model
+2025-05-04 13:54:36,394 - distillation - INFO - PyTorch nightly版を検出: 2.7.0.dev20250309+cu128
+2025-05-04 13:54:36,399 - distillation - INFO - RAM使用状況: 17.3% (使用中: 16.5GB, 空き: 78.9GB)
+2025-05-04 13:54:36,399 - distillation - INFO - Loading teacher model: elyza/ELYZA-Thinking-1.0-Qwen-32B
+2025-05-04 13:54:36,399 - distillation - INFO - GPU直接アクセスモードで実行します（最適化ライブラリ未使用）
+2025-05-04 13:54:36,400 - distillation - INFO - Windows互換モードで実行しています
+2025-05-04 13:54:37,562 - distillation - INFO - xformersが使用可能です
+2025-05-04 13:54:37,562 - distillation - INFO - Configuring 4-bit quantization for teacher model
+2025-05-04 13:54:37,568 - distillation - INFO - Using automatic device mapping with CPU offloading
+2025-05-04 13:54:37,955 - distillation - ERROR - Failed to load teacher model: Failed to import transformers.models.qwen2.modeling_qwen2 because of the following error (look up to see its traceback):
+No module named 'triton'
+2025-05-04 13:54:37,955 - distillation - ERROR - tritonモジュールが見つかりません。PyTorch nightlyを使用している可能性があります。
+2025-05-04 13:54:37,956 - distillation - INFO - --use_direct_gpu オプションを使用するか、別のモデルを選択してください。
+2025-05-04 13:54:37,957 - distillation - INFO - 以下のモデルはWindows環境でも動作します:
+2025-05-04 13:54:37,958 - distillation - INFO - 1. elyza/elyza-japanese-llama-2-7b
+2025-05-04 13:54:37,958 - distillation - INFO - 2. stabilityai/stablelm-base-alpha-7b
+2025-05-04 13:54:37,959 - distillation - INFO - 3. cyberagent/calm2-7b
+2025-05-04 14:00:10,236 - __main__ - INFO - Starting knowledge distillation process
+2025-05-04 14:00:10,246 - __main__ - INFO - RAM: 使用中 15.8GB / 95.4GB (16.6%)
+2025-05-04 14:00:10,305 - __main__ - INFO - GPU 0 (NVIDIA GeForce RTX 5070 Ti): 確保 0.0GB / 予約 0.0GB / 合計 15.9GB
+2025-05-04 14:00:10,305 - __main__ - INFO - Windows環境を検出しました
+2025-05-04 14:00:10,306 - __main__ - WARNING - WindowsでQwen2モデルを使用する場合はwindows_modeを推奨します
+2025-05-04 14:00:14,455 - __main__ - INFO - windows_modeを有効にしました
+2025-05-04 14:00:14,456 - __main__ - INFO - PyTorch nightly版を検出: 2.7.0.dev20250309+cu128
+2025-05-04 14:00:14,456 - __main__ - INFO - Using device: cuda
+2025-05-04 14:00:14,456 - __main__ - INFO - GPU: NVIDIA GeForce RTX 5070 Ti
+2025-05-04 14:00:14,456 - __main__ - INFO - CUDA Version: 12.8
+2025-05-04 14:00:14,456 - __main__ - INFO - GPU Memory: 15.9 GB
+2025-05-04 14:00:14,457 - __main__ - INFO - Loading tokenizer for elyza/ELYZA-Thinking-1.0-Qwen-32B
+2025-05-04 14:00:15,291 - __main__ - INFO - Initializing student model
+2025-05-04 14:00:16,128 - distillation - INFO - PyTorch nightly版を検出: 2.7.0.dev20250309+cu128
+2025-05-04 14:00:16,141 - distillation - INFO - RAM使用状況: 17.6% (使用中: 16.8GB, 空き: 78.6GB)
+2025-05-04 14:00:16,141 - distillation - INFO - Loading teacher model: elyza/ELYZA-Thinking-1.0-Qwen-32B
+2025-05-04 14:00:16,142 - distillation - INFO - GPU直接アクセスモードで実行します（最適化ライブラリ未使用）
+2025-05-04 14:00:16,142 - distillation - INFO - Windows互換モードで実行しています
+2025-05-04 14:00:17,285 - distillation - INFO - xformersが使用可能です
+2025-05-04 14:00:17,286 - distillation - INFO - Configuring 4-bit quantization for teacher model
+2025-05-04 14:00:17,294 - distillation - INFO - Using automatic device mapping with CPU offloading
+2025-05-04 14:00:17,686 - distillation - ERROR - Failed to load teacher model: Failed to import transformers.models.qwen2.modeling_qwen2 because of the following error (look up to see its traceback):
+No module named 'triton'
+2025-05-04 14:00:17,687 - distillation - ERROR - tritonモジュールが見つかりません。PyTorch nightlyを使用している可能性があります。
+2025-05-04 14:00:17,687 - distillation - INFO - --use_direct_gpu オプションを使用するか、別のモデルを選択してください。
+2025-05-04 14:00:17,687 - distillation - INFO - 以下のモデルはWindows環境でも動作します:
+2025-05-04 14:00:17,688 - distillation - INFO - 1. elyza/elyza-japanese-llama-2-7b
+2025-05-04 14:00:17,688 - distillation - INFO - 2. stabilityai/stablelm-base-alpha-7b
+2025-05-04 14:00:17,688 - distillation - INFO - 3. cyberagent/calm2-7b
+2025-05-04 14:00:47,649 - __main__ - ERROR - Error initializing distiller with elyza/ELYZA-Thinking-1.0-Qwen-32B: Failed to import transformers.models.qwen2.modeling_qwen2 because of the following error (look up to see its traceback):
+No module named 'triton'
+2025-05-04 14:00:47,649 - __main__ - ERROR - triton または flash-attn モジュールがインストールされていません
+2025-05-04 14:00:47,649 - __main__ - INFO - 必要なパッケージをインストールするか、代替モデルを使用してください
+2025-05-04 14:00:48,025 - __main__ - INFO - 代替の教師モデルを使用するか、--use_cpu_only オプションを使用してみてください
+2025-05-04 14:00:48,025 - __main__ - INFO - 代替モデルの候補:
+2025-05-04 14:00:48,025 - __main__ - INFO - 1. elyza/elyza-japanese-llama-2-7b
+2025-05-04 14:00:48,026 - __main__ - INFO -    - バランスの取れた日本語対応モデル
+2025-05-04 14:00:48,026 - __main__ - INFO - 2. microsoft/Phi-4-reasoning
+2025-05-04 14:00:48,026 - __main__ - INFO -    - 小型で高性能な推論特化モデル
+2025-05-04 14:00:48,026 - __main__ - INFO - 3. elyza/Llama-3-ELYZA-JP-8B
+2025-05-04 14:00:48,027 - __main__ - INFO -    - Llama-3ベースの高性能日本語モデル
+2025-05-04 14:00:48,027 - __main__ - INFO - 4. stabilityai/stablelm-base-alpha-7b
+2025-05-04 14:00:48,027 - __main__ - INFO -    - 安定した軽量ベースモデル
+2025-05-04 14:00:57,897 - __main__ - INFO - Starting knowledge distillation process
+2025-05-04 14:00:57,902 - __main__ - INFO - RAM: 使用中 15.7GB / 95.4GB (16.5%)
+2025-05-04 14:00:57,966 - __main__ - INFO - GPU 0 (NVIDIA GeForce RTX 5070 Ti): 確保 0.0GB / 予約 0.0GB / 合計 15.9GB
+2025-05-04 14:00:57,966 - __main__ - INFO - Windows環境を検出しました
+2025-05-04 14:00:57,967 - __main__ - WARNING - WindowsでQwen2モデルを使用する場合はwindows_modeを推奨します
+2025-05-04 14:01:02,685 - __main__ - INFO - windows_modeを有効にしました
+2025-05-04 14:01:02,685 - __main__ - INFO - PyTorch nightly版を検出: 2.7.0.dev20250309+cu128
+2025-05-04 14:01:02,686 - __main__ - INFO - Using device: cuda
+2025-05-04 14:01:02,686 - __main__ - INFO - GPU: NVIDIA GeForce RTX 5070 Ti
+2025-05-04 14:01:02,686 - __main__ - INFO - CUDA Version: 12.8
+2025-05-04 14:01:02,686 - __main__ - INFO - GPU Memory: 15.9 GB
+2025-05-04 14:01:02,687 - __main__ - INFO - Loading tokenizer for elyza/ELYZA-Thinking-1.0-Qwen-32B
+2025-05-04 14:01:03,227 - __main__ - INFO - Initializing student model
+2025-05-04 14:01:04,106 - distillation - INFO - PyTorch nightly版を検出: 2.7.0.dev20250309+cu128
+2025-05-04 14:01:04,110 - distillation - INFO - RAM使用状況: 17.6% (使用中: 16.8GB, 空き: 78.6GB)
+2025-05-04 14:01:04,111 - distillation - INFO - Loading teacher model: elyza/ELYZA-Thinking-1.0-Qwen-32B
+2025-05-04 14:01:04,111 - distillation - INFO - GPU直接アクセスモードで実行します（最適化ライブラリ未使用）
+2025-05-04 14:01:04,112 - distillation - INFO - Windows互換モードで実行しています
+2025-05-04 14:01:05,280 - distillation - INFO - xformersが使用可能です
+2025-05-04 14:01:05,281 - distillation - INFO - Configuring 4-bit quantization for teacher model
+2025-05-04 14:01:05,282 - distillation - INFO - Using automatic device mapping with CPU offloading
+2025-05-04 14:01:05,676 - distillation - ERROR - Failed to load teacher model: Failed to import transformers.models.qwen2.modeling_qwen2 because of the following error (look up to see its traceback):
+No module named 'triton'
+2025-05-04 14:01:05,676 - distillation - ERROR - tritonモジュールが見つかりません。PyTorch nightlyを使用している可能性があります。
+2025-05-04 14:01:05,677 - distillation - INFO - --use_direct_gpu オプションを使用するか、別のモデルを選択してください。
+2025-05-04 14:01:05,677 - distillation - INFO - 以下のモデルはWindows環境でも動作します:
+2025-05-04 14:01:05,678 - distillation - INFO - 1. elyza/elyza-japanese-llama-2-7b
+2025-05-04 14:01:05,678 - distillation - INFO - 2. stabilityai/stablelm-base-alpha-7b
+2025-05-04 14:01:05,679 - distillation - INFO - 3. cyberagent/calm2-7b
+2025-05-04 14:01:08,356 - __main__ - ERROR - Error initializing distiller with elyza/ELYZA-Thinking-1.0-Qwen-32B: Failed to import transformers.models.qwen2.modeling_qwen2 because of the following error (look up to see its traceback):
+No module named 'triton'
+2025-05-04 14:01:08,357 - __main__ - ERROR - triton または flash-attn モジュールがインストールされていません
+2025-05-04 14:01:08,357 - __main__ - INFO - 必要なパッケージをインストールするか、代替モデルを使用してください
+2025-05-04 14:01:10,095 - __main__ - INFO - 代替の教師モデルを使用するか、--use_cpu_only オプションを使用してみてください
+2025-05-04 14:01:10,095 - __main__ - INFO - 代替モデルの候補:
+2025-05-04 14:01:10,096 - __main__ - INFO - 1. elyza/elyza-japanese-llama-2-7b
+2025-05-04 14:01:10,096 - __main__ - INFO -    - バランスの取れた日本語対応モデル
+2025-05-04 14:01:10,096 - __main__ - INFO - 2. microsoft/Phi-4-reasoning
+2025-05-04 14:01:10,096 - __main__ - INFO -    - 小型で高性能な推論特化モデル
+2025-05-04 14:01:10,096 - __main__ - INFO - 3. elyza/Llama-3-ELYZA-JP-8B
+2025-05-04 14:01:10,096 - __main__ - INFO -    - Llama-3ベースの高性能日本語モデル
+2025-05-04 14:01:10,097 - __main__ - INFO - 4. stabilityai/stablelm-base-alpha-7b
+2025-05-04 14:01:10,097 - __main__ - INFO -    - 安定した軽量ベースモデル
+2025-05-04 14:01:25,878 - __main__ - INFO - 代替モデル microsoft/Phi-4-reasoning を使用します
+2025-05-04 14:01:25,878 - __main__ - INFO - Phi-4-reasoning用に設定を最適化しています
+2025-05-04 14:01:32,252 - __main__ - INFO - Starting knowledge distillation process
+2025-05-04 14:01:32,258 - __main__ - INFO - RAM: 使用中 16.9GB / 95.4GB (17.7%)
+2025-05-04 14:01:32,259 - __main__ - INFO - GPU 0 (NVIDIA GeForce RTX 5070 Ti): 確保 0.0GB / 予約 0.0GB / 合計 15.9GB
+2025-05-04 14:01:32,259 - __main__ - INFO - Windows環境を検出しました
+2025-05-04 14:01:32,260 - __main__ - INFO - PyTorch nightly版を検出: 2.7.0.dev20250309+cu128
+2025-05-04 14:01:32,260 - __main__ - INFO - Using device: cuda
+2025-05-04 14:01:32,260 - __main__ - INFO - GPU: NVIDIA GeForce RTX 5070 Ti
+2025-05-04 14:01:32,260 - __main__ - INFO - CUDA Version: 12.8
+2025-05-04 14:01:32,261 - __main__ - INFO - GPU Memory: 15.9 GB
+2025-05-04 14:01:32,261 - __main__ - INFO - Loading tokenizer for microsoft/Phi-4-reasoning
+2025-05-04 14:01:36,381 - __main__ - INFO - Initializing student model
+2025-05-04 14:01:37,000 - distillation - INFO - PyTorch nightly版を検出: 2.7.0.dev20250309+cu128
+2025-05-04 14:01:37,011 - distillation - INFO - RAM使用状況: 18.5% (使用中: 17.6GB, 空き: 77.8GB)
+2025-05-04 14:01:37,011 - distillation - INFO - Loading teacher model: microsoft/Phi-4-reasoning
+2025-05-04 14:01:37,011 - distillation - INFO - GPU直接アクセスモードで実行します（最適化ライブラリ未使用）
+2025-05-04 14:01:37,012 - distillation - INFO - Windows互換モードで実行しています
+2025-05-04 14:01:37,013 - distillation - INFO - xformersが使用可能です
+2025-05-04 14:01:37,013 - distillation - INFO - Configuring 4-bit quantization for teacher model
+2025-05-04 14:01:37,015 - distillation - INFO - Using automatic device mapping with CPU offloading
+2025-05-04 14:01:37,520 - distillation - ERROR - Failed to load teacher model: Failed to import transformers.models.phi3.modeling_phi3 because of the following error (look up to see its traceback):
+No module named 'triton'
+2025-05-04 14:01:37,520 - distillation - ERROR - tritonモジュールが見つかりません。PyTorch nightlyを使用している可能性があります。
+2025-05-04 14:01:37,520 - distillation - INFO - --use_direct_gpu オプションを使用するか、別のモデルを選択してください。
+2025-05-04 14:01:37,520 - distillation - INFO - 以下のモデルはWindows環境でも動作します:
+2025-05-04 14:01:37,522 - distillation - INFO - 1. elyza/elyza-japanese-llama-2-7b
+2025-05-04 14:01:37,522 - distillation - INFO - 2. stabilityai/stablelm-base-alpha-7b
+2025-05-04 14:01:37,522 - distillation - INFO - 3. cyberagent/calm2-7b
+2025-05-04 14:01:53,566 - __main__ - ERROR - Error initializing distiller with microsoft/Phi-4-reasoning: Failed to import transformers.models.phi3.modeling_phi3 because of the following error (look up to see its traceback):
+No module named 'triton'
+2025-05-04 14:01:53,566 - __main__ - ERROR - triton または flash-attn モジュールがインストールされていません
+2025-05-04 14:01:53,567 - __main__ - INFO - 必要なパッケージをインストールするか、代替モデルを使用してください
+2025-05-04 14:01:55,276 - __main__ - INFO - 代替の教師モデルを使用するか、--use_cpu_only オプションを使用してみてください
+2025-05-04 14:01:55,277 - __main__ - INFO - 代替モデルの候補:
+2025-05-04 14:01:55,277 - __main__ - INFO - 1. elyza/elyza-japanese-llama-2-7b
+2025-05-04 14:01:55,277 - __main__ - INFO -    - バランスの取れた日本語対応モデル
+2025-05-04 14:01:55,277 - __main__ - INFO - 2. microsoft/Phi-4-reasoning
+2025-05-04 14:01:55,278 - __main__ - INFO -    - 小型で高性能な推論特化モデル
+2025-05-04 14:01:55,278 - __main__ - INFO - 3. elyza/Llama-3-ELYZA-JP-8B
+2025-05-04 14:01:55,278 - __main__ - INFO -    - Llama-3ベースの高性能日本語モデル
+2025-05-04 14:01:55,278 - __main__ - INFO - 4. stabilityai/stablelm-base-alpha-7b
+2025-05-04 14:01:55,278 - __main__ - INFO -    - 安定した軽量ベースモデル
+2025-05-04 14:01:58,564 - __main__ - INFO - 代替モデル elyza/Llama-3-ELYZA-JP-8B を使用します
+2025-05-04 14:01:58,564 - __main__ - INFO - Llama-3-ELYZA-JP-8B用に設定を最適化しています
+2025-05-04 14:02:04,151 - __main__ - INFO - Starting knowledge distillation process
+2025-05-04 14:02:04,157 - __main__ - INFO - RAM: 使用中 17.6GB / 95.4GB (18.5%)
+2025-05-04 14:02:04,157 - __main__ - INFO - GPU 0 (NVIDIA GeForce RTX 5070 Ti): 確保 0.0GB / 予約 0.0GB / 合計 15.9GB
+2025-05-04 14:02:04,158 - __main__ - INFO - Windows環境を検出しました
+2025-05-04 14:02:04,158 - __main__ - INFO - PyTorch nightly版を検出: 2.7.0.dev20250309+cu128
+2025-05-04 14:02:04,158 - __main__ - INFO - Using device: cuda
+2025-05-04 14:02:04,159 - __main__ - INFO - GPU: NVIDIA GeForce RTX 5070 Ti
+2025-05-04 14:02:04,159 - __main__ - INFO - CUDA Version: 12.8
+2025-05-04 14:02:04,159 - __main__ - INFO - GPU Memory: 15.9 GB
+2025-05-04 14:02:04,159 - __main__ - INFO - Loading tokenizer for elyza/Llama-3-ELYZA-JP-8B
+2025-05-04 14:02:04,679 - __main__ - INFO - Initializing student model
+2025-05-04 14:02:05,410 - distillation - INFO - PyTorch nightly版を検出: 2.7.0.dev20250309+cu128
+2025-05-04 14:02:05,422 - distillation - INFO - RAM使用状況: 19.4% (使用中: 18.5GB, 空き: 76.9GB)
+2025-05-04 14:02:05,423 - distillation - INFO - Loading teacher model: elyza/Llama-3-ELYZA-JP-8B
+2025-05-04 14:02:05,424 - distillation - INFO - GPU直接アクセスモードで実行します（最適化ライブラリ未使用）
+2025-05-04 14:02:05,424 - distillation - INFO - Windows互換モードで実行しています
+2025-05-04 14:02:05,425 - distillation - INFO - xformersが使用可能です
+2025-05-04 14:02:05,426 - distillation - INFO - Configuring 4-bit quantization for teacher model
+2025-05-04 14:02:05,427 - distillation - INFO - Using automatic device mapping with CPU offloading
+2025-05-04 14:02:05,665 - distillation - ERROR - Failed to load teacher model: Failed to import transformers.models.llama.modeling_llama because of the following error (look up to see its traceback):
+No module named 'triton'
+2025-05-04 14:02:05,665 - distillation - ERROR - tritonモジュールが見つかりません。PyTorch nightlyを使用している可能性があります。
+2025-05-04 14:02:05,666 - distillation - INFO - --use_direct_gpu オプションを使用するか、別のモデルを選択してください。
+2025-05-04 14:02:05,666 - distillation - INFO - 以下のモデルはWindows環境でも動作します:
+2025-05-04 14:02:05,667 - distillation - INFO - 1. elyza/elyza-japanese-llama-2-7b
+2025-05-04 14:02:05,667 - distillation - INFO - 2. stabilityai/stablelm-base-alpha-7b
+2025-05-04 14:02:05,668 - distillation - INFO - 3. cyberagent/calm2-7b
+2025-05-04 14:02:15,418 - __main__ - ERROR - Error initializing distiller with elyza/Llama-3-ELYZA-JP-8B: Failed to import transformers.models.llama.modeling_llama because of the following error (look up to see its traceback):
+No module named 'triton'
+2025-05-04 14:02:15,419 - __main__ - ERROR - triton または flash-attn モジュールがインストールされていません
+2025-05-04 14:02:15,419 - __main__ - INFO - 必要なパッケージをインストールするか、代替モデルを使用してください
+2025-05-04 14:02:17,484 - __main__ - INFO - 代替の教師モデルを使用するか、--use_cpu_only オプションを使用してみてください
+2025-05-04 14:02:17,484 - __main__ - INFO - 代替モデルの候補:
+2025-05-04 14:02:17,484 - __main__ - INFO - 1. elyza/elyza-japanese-llama-2-7b
+2025-05-04 14:02:17,484 - __main__ - INFO -    - バランスの取れた日本語対応モデル
+2025-05-04 14:02:17,484 - __main__ - INFO - 2. microsoft/Phi-4-reasoning
+2025-05-04 14:02:17,485 - __main__ - INFO -    - 小型で高性能な推論特化モデル
+2025-05-04 14:02:17,485 - __main__ - INFO - 3. elyza/Llama-3-ELYZA-JP-8B
+2025-05-04 14:02:17,485 - __main__ - INFO -    - Llama-3ベースの高性能日本語モデル
+2025-05-04 14:02:17,485 - __main__ - INFO - 4. stabilityai/stablelm-base-alpha-7b
+2025-05-04 14:02:17,485 - __main__ - INFO -    - 安定した軽量ベースモデル
+2025-05-04 23:55:20,349 - __main__ - INFO - Starting knowledge distillation process
+2025-05-04 23:55:20,362 - __main__ - INFO - RAM: 使用中 17.7GB / 95.4GB (18.5%)
+2025-05-04 23:55:20,566 - __main__ - INFO - GPU 0 (NVIDIA GeForce RTX 5070 Ti): 確保 0.0GB / 予約 0.0GB / 合計 15.9GB
+2025-05-04 23:55:20,566 - __main__ - INFO - Windows環境を検出しました
+2025-05-04 23:55:20,568 - __main__ - WARNING - WindowsでQwen2モデルを使用する場合はwindows_modeを推奨します
+2025-05-04 23:56:56,869 - __main__ - INFO - windows_modeを有効にしました
+2025-05-04 23:56:56,870 - __main__ - INFO - PyTorch nightly版を検出: 2.7.0.dev20250309+cu128
+2025-05-04 23:56:56,871 - __main__ - WARNING - PyTorch nightly版ではGPU最適化ライブラリが使用できない場合があります
+2025-05-04 23:56:56,872 - __main__ - INFO - --use_direct_gpu オプションを使用することを推奨します
+2025-05-04 23:59:39,194 - __main__ - INFO - Using device: cuda
+2025-05-04 23:59:39,194 - __main__ - INFO - GPU: NVIDIA GeForce RTX 5070 Ti
+2025-05-04 23:59:39,194 - __main__ - INFO - CUDA Version: 12.8
+2025-05-04 23:59:39,195 - __main__ - INFO - GPU Memory: 15.9 GB
+2025-05-04 23:59:39,195 - __main__ - INFO - Loading tokenizer for elyza/ELYZA-Thinking-1.0-Qwen-32B
+2025-05-04 23:59:39,832 - __main__ - INFO - Initializing student model
+2025-05-04 23:59:40,700 - distillation - INFO - PyTorch nightly版を検出: 2.7.0.dev20250309+cu128
+2025-05-04 23:59:40,705 - distillation - INFO - RAM使用状況: 19.6% (使用中: 18.7GB, 空き: 76.7GB)
+2025-05-04 23:59:40,706 - distillation - INFO - Loading teacher model: elyza/ELYZA-Thinking-1.0-Qwen-32B
+2025-05-04 23:59:40,706 - distillation - INFO - GPU直接アクセスモードで実行します（最適化ライブラリ未使用）
+2025-05-04 23:59:40,707 - distillation - INFO - Windows互換モードで実行しています
+2025-05-04 23:59:43,072 - distillation - INFO - xformersが使用可能です
+2025-05-04 23:59:43,072 - distillation - INFO - Configuring 4-bit quantization for teacher model
+2025-05-04 23:59:43,074 - distillation - INFO - Using automatic device mapping with CPU offloading
+2025-05-05 00:00:33,056 - distillation - INFO - モデルをcudaに手動で移動します
+2025-05-05 00:01:10,430 - distillation - INFO - Teacher model loaded successfully
+2025-05-05 00:01:10,431 - __main__ - INFO - Generating 5000 distillation examples
+2025-05-05 00:01:10,433 - distillation - INFO - Preparing distillation data from questions.txt
+2025-05-05 00:01:10,434 - distillation - INFO - Questions file questions.txt not found, generating automatically
+2025-05-05 00:09:49,643 - __main__ - INFO - Starting knowledge distillation process
+2025-05-05 00:09:49,655 - __main__ - INFO - RAM: 使用中 17.4GB / 95.4GB (18.2%)
+2025-05-05 00:09:49,720 - __main__ - INFO - GPU 0 (NVIDIA GeForce RTX 5070 Ti): 確保 0.0GB / 予約 0.0GB / 合計 15.9GB
+2025-05-05 00:09:49,721 - __main__ - INFO - Windows環境を検出しました
+2025-05-05 00:09:49,722 - __main__ - WARNING - WindowsでQwen2モデルを使用する場合はwindows_modeを推奨します
+2025-05-05 00:10:41,676 - __main__ - INFO - windows_modeを有効にしました
+2025-05-05 00:10:41,677 - __main__ - INFO - PyTorch nightly版を検出: 2.7.0.dev20250309+cu128
+2025-05-05 00:10:41,677 - __main__ - WARNING - PyTorch nightly版ではGPU最適化ライブラリが使用できない場合があります
+2025-05-05 00:10:41,677 - __main__ - INFO - --use_direct_gpu オプションを使用することを推奨します
+2025-05-05 00:10:58,617 - __main__ - INFO - Using device: cuda
+2025-05-05 00:10:58,617 - __main__ - INFO - GPU: NVIDIA GeForce RTX 5070 Ti
+2025-05-05 00:10:58,617 - __main__ - INFO - CUDA Version: 12.8
+2025-05-05 00:10:58,617 - __main__ - INFO - GPU Memory: 15.9 GB
+2025-05-05 00:10:58,618 - __main__ - INFO - Loading tokenizer for elyza/ELYZA-Thinking-1.0-Qwen-32B
+2025-05-05 00:10:59,225 - __main__ - INFO - Initializing student model
+2025-05-05 00:11:00,125 - distillation - INFO - PyTorch nightly版を検出: 2.7.0.dev20250309+cu128
+2025-05-05 00:11:00,129 - distillation - INFO - RAM使用状況: 19.2% (使用中: 18.3GB, 空き: 77.0GB)
+2025-05-05 00:11:00,130 - distillation - INFO - Loading teacher model: elyza/ELYZA-Thinking-1.0-Qwen-32B
+2025-05-05 00:11:00,130 - distillation - INFO - GPU直接アクセスモードで実行します（最適化ライブラリ未使用）
+2025-05-05 00:11:00,131 - distillation - INFO - Windows互換モードで実行しています
+2025-05-05 00:11:01,919 - distillation - INFO - xformersが使用可能です
+2025-05-05 00:11:01,920 - distillation - INFO - Configuring 4-bit quantization for teacher model
+2025-05-05 00:11:01,927 - distillation - INFO - Using automatic device mapping with CPU offloading
+2025-05-05 00:11:48,156 - distillation - INFO - モデルをcudaに手動で移動します
+2025-05-05 00:12:27,918 - distillation - INFO - Teacher model loaded successfully
+2025-05-05 00:12:27,921 - __main__ - INFO - Generating 5000 distillation examples
+2025-05-05 00:12:27,922 - distillation - INFO - Preparing distillation data from questions.txt
+2025-05-05 00:12:27,923 - distillation - INFO - Questions file questions.txt not found, generating automatically
+2025-05-05 00:16:31,872 - __main__ - INFO - Starting knowledge distillation process
+2025-05-05 00:16:31,879 - __main__ - INFO - RAM: 使用中 17.4GB / 95.4GB (18.3%)
+2025-05-05 00:16:31,942 - __main__ - INFO - GPU 0 (NVIDIA GeForce RTX 5070 Ti): 確保 0.0GB / 予約 0.0GB / 合計 15.9GB
+2025-05-05 00:16:31,942 - __main__ - INFO - Windows環境を検出しました
+2025-05-05 00:16:31,943 - __main__ - WARNING - WindowsでQwen2モデルを使用する場合はwindows_modeを推奨します
+2025-05-05 00:17:39,959 - __main__ - INFO - windows_modeを有効にしました
+2025-05-05 00:17:39,959 - __main__ - INFO - PyTorch nightly版を検出: 2.7.0.dev20250309+cu128
+2025-05-05 00:17:39,959 - __main__ - WARNING - PyTorch nightly版ではGPU最適化ライブラリが使用できない場合があります
+2025-05-05 00:17:39,960 - __main__ - INFO - --use_direct_gpu オプションを使用することを推奨します
+2025-05-05 00:17:42,620 - __main__ - INFO - Using device: cuda
+2025-05-05 00:17:42,621 - __main__ - INFO - GPU: NVIDIA GeForce RTX 5070 Ti
+2025-05-05 00:17:42,621 - __main__ - INFO - CUDA Version: 12.8
+2025-05-05 00:17:42,621 - __main__ - INFO - GPU Memory: 15.9 GB
+2025-05-05 00:17:42,621 - __main__ - INFO - Loading tokenizer for elyza/ELYZA-Thinking-1.0-Qwen-32B
+2025-05-05 00:17:43,225 - __main__ - INFO - Initializing student model
+2025-05-05 00:17:44,137 - distillation - INFO - PyTorch nightly版を検出: 2.7.0.dev20250309+cu128
+2025-05-05 00:17:44,142 - distillation - INFO - RAM使用状況: 19.4% (使用中: 18.5GB, 空き: 76.9GB)
+2025-05-05 00:17:44,142 - distillation - INFO - Loading teacher model: elyza/ELYZA-Thinking-1.0-Qwen-32B
+2025-05-05 00:17:44,142 - distillation - INFO - GPU直接アクセスモードで実行します（最適化ライブラリ未使用）
+2025-05-05 00:17:44,143 - distillation - INFO - Windows互換モードで実行しています
+2025-05-05 00:17:45,808 - distillation - INFO - xformersが使用可能です
+2025-05-05 00:17:45,808 - distillation - INFO - Configuring 4-bit quantization for teacher model
+2025-05-05 00:17:45,810 - distillation - INFO - Using automatic device mapping with CPU offloading
+2025-05-05 00:18:33,005 - distillation - INFO - モデルをcudaに手動で移動します
+2025-05-05 00:19:12,726 - distillation - INFO - Teacher model loaded successfully
+2025-05-05 00:19:12,728 - __main__ - INFO - Generating 5000 distillation examples
+2025-05-05 00:19:12,728 - distillation - INFO - Preparing distillation data from questions.txt
+2025-05-05 00:19:12,729 - distillation - INFO - Questions file questions.txt not found, generating automatically
+2025-05-05 00:19:12,730 - distillation - INFO - Generating 4000 questions for distillation
+2025-05-05 00:19:12,730 - distillation - INFO - Generated 0 questions
+2025-05-05 00:19:12,743 - distillation - INFO - Generated 100 questions
+2025-05-05 00:19:12,745 - distillation - INFO - Generated 200 questions
+2025-05-05 00:19:12,752 - distillation - INFO - Generated 300 questions
+2025-05-05 00:19:12,754 - distillation - INFO - Generated 400 questions
+2025-05-05 00:19:12,756 - distillation - INFO - Generated 500 questions
+2025-05-05 00:19:12,758 - distillation - INFO - Generated 600 questions
+2025-05-05 00:19:12,760 - distillation - INFO - Generated 700 questions
+2025-05-05 00:19:12,762 - distillation - INFO - Generated 800 questions
+2025-05-05 00:19:12,764 - distillation - INFO - Generated 900 questions
+2025-05-05 00:19:12,765 - distillation - INFO - Generated 1000 questions
+2025-05-05 00:19:12,767 - distillation - INFO - Generated 1100 questions
+2025-05-05 00:19:12,769 - distillation - INFO - Generated 1200 questions
+2025-05-05 00:19:12,770 - distillation - INFO - Generated 1300 questions
+2025-05-05 00:19:12,772 - distillation - INFO - Generated 1400 questions
+2025-05-05 00:19:12,774 - distillation - INFO - Generated 1500 questions
+2025-05-05 00:19:12,775 - distillation - INFO - Generated 1600 questions
+2025-05-05 00:19:12,777 - distillation - INFO - Generated 1700 questions
+2025-05-05 00:19:12,779 - distillation - INFO - Generated 1800 questions
+2025-05-05 00:19:12,780 - distillation - INFO - Generated 1900 questions
+2025-05-05 00:19:12,782 - distillation - INFO - Generated 2000 questions
+2025-05-05 00:19:12,784 - distillation - INFO - Generated 2100 questions
+2025-05-05 00:19:12,785 - distillation - INFO - Generated 2200 questions
+2025-05-05 00:19:12,787 - distillation - INFO - Generated 2300 questions
+2025-05-05 00:19:12,789 - distillation - INFO - Generated 2400 questions
+2025-05-05 00:19:12,791 - distillation - INFO - Generated 2500 questions
+2025-05-05 00:19:12,792 - distillation - INFO - Generated 2600 questions
+2025-05-05 00:19:12,794 - distillation - INFO - Generated 2700 questions
+2025-05-05 00:19:12,796 - distillation - INFO - Generated 2800 questions
+2025-05-05 00:19:12,798 - distillation - INFO - Generated 2900 questions
+2025-05-05 00:19:12,799 - distillation - INFO - Generated 3000 questions
+2025-05-05 00:19:12,801 - distillation - INFO - Generated 3100 questions
+2025-05-05 00:19:12,803 - distillation - INFO - Generated 3200 questions
+2025-05-05 00:19:12,804 - distillation - INFO - Generated 3300 questions
+2025-05-05 00:19:12,806 - distillation - INFO - Generated 3400 questions
+2025-05-05 00:19:12,808 - distillation - INFO - Generated 3500 questions
+2025-05-05 00:19:12,810 - distillation - INFO - Generated 3600 questions
+2025-05-05 00:19:12,811 - distillation - INFO - Generated 3700 questions
+2025-05-05 00:19:12,813 - distillation - INFO - Generated 3800 questions
+2025-05-05 00:19:12,816 - distillation - INFO - Generated 3900 questions
+2025-05-05 00:19:12,820 - distillation - INFO - Generated questions saved to questions.txt
+2025-05-05 00:19:12,821 - distillation - INFO - Using PyTorch nightly version 2.7.0.dev20250309+cu128 for data generation
+2025-05-05 00:19:12,821 - distillation - INFO - Processing batch 1/1000
+2025-05-05 00:38:38,045 - distillation - INFO - Processing batch 2/1000

@@ -3,17 +3,19 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
-from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
+from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig, PreTrainedTokenizer
 import numpy as np
 import os
 import json
 import gc
+import shutil
 from typing import Dict, List, Tuple, Optional
 from tqdm import tqdm
 import logging
 import math
 import psutil
 from datetime import datetime
+import sys
 
 from brain_model import BrainModel
 
@@ -102,15 +104,30 @@ class KnowledgeDistiller:
         device: torch.device,
         config: Dict,
         quantize: bool = True,
-        cpu_offload: bool = True
+        cpu_offload: bool = True,
+        use_cpu_only: bool = False
     ):
         self.teacher_model_name = teacher_model_name
         self.student_model = student_model
         self.tokenizer = tokenizer
-        self.device = device
+        self.device = "cpu" if use_cpu_only else device
         self.config = config
-        self.quantize = quantize
-        self.cpu_offload = cpu_offload
+        self.quantize = quantize and not use_cpu_only
+        self.cpu_offload = cpu_offload and not use_cpu_only
+        self.use_cpu_only = use_cpu_only
+        self.windows_mode = config.get("windows_mode", False) or sys.platform.startswith('win')
+        self.use_direct_gpu = config.get("use_direct_gpu", False)
+        
+        # PyTorch nightlyの検出
+        is_nightly = False
+        try:
+            torch_version = torch.__version__
+            if 'dev' in torch_version or 'nightly' in torch_version:
+                is_nightly = True
+                logger.info(f"PyTorch nightly版を検出: {torch_version}")
+                self.use_direct_gpu = True  # 強制的に直接GPUモードを有効化
+        except:
+            pass
         
         # RAM使用状況を記録
         ram_usage = psutil.virtual_memory()
@@ -118,8 +135,36 @@ class KnowledgeDistiller:
         
         logger.info(f"Loading teacher model: {teacher_model_name}")
         
+        # 直接GPUアクセスモードの設定
+        if self.use_direct_gpu:
+            logger.info("GPU直接アクセスモードで実行します（最適化ライブラリ未使用）")
+            
+            # 環境変数を設定してQwen2の特殊機能を無効化
+            os.environ["USE_FLASH_ATTENTION"] = "0"
+            os.environ["CUDA_LAUNCH_BLOCKING"] = "1"  # デバッグに役立つ場合がある
+            
+            # メモリの使用方法を設定
+            torch.backends.cuda.matmul.allow_tf32 = True  # TF32を有効化（精度は下がるが高速）
+            torch.backends.cudnn.benchmark = True  # 繰り返し同じサイズの計算に最適化
+        
+        # Windows環境の場合の設定
+        if self.windows_mode:
+            logger.info("Windows互換モードで実行しています")
+            
+            # 環境変数を設定してQwen2の特殊機能を無効化
+            os.environ["USE_FLASH_ATTENTION"] = "0"
+            
+            # Windows環境ではxformersを使用可能か確認
+            try:
+                import xformers
+                logger.info("xformersが使用可能です")
+                os.environ["XFORMERS_ATTENTION"] = "1"  # xformers注意機構を有効化
+            except ImportError:
+                logger.warning("xformersが見つかりません。パフォーマンスが低下する可能性があります。")
+                logger.info("pip install xformers>=0.0.20 でインストールを試みてください")
+        
         # 量子化設定
-        if quantize:
+        if self.quantize:
             logger.info("Configuring 4-bit quantization for teacher model")
             bnb_config = BitsAndBytesConfig(
                 load_in_4bit=True,
@@ -131,7 +176,10 @@ class KnowledgeDistiller:
             bnb_config = None
         
         # デバイスマップ設定
-        if cpu_offload:
+        if self.use_cpu_only:
+            device_map = "cpu"
+            logger.info("Using CPU only mode")
+        elif self.cpu_offload:
             device_map = "auto"
             logger.info("Using automatic device mapping with CPU offloading")
         else:
@@ -139,12 +187,42 @@ class KnowledgeDistiller:
         
         # 教師モデルの読み込み
         try:
+            # モデル読み込み時のオプション
+            model_kwargs = {
+                "device_map": device_map,
+                "torch_dtype": torch.float16 if not self.use_cpu_only else torch.float32,
+                "use_cache": True
+            }
+            
+            # Nightly版/直接GPUモード向けのカスタム設定
+            if self.use_direct_gpu and not self.use_cpu_only:
+                # 最も基本的なGPU設定
+                model_kwargs = {
+                    "torch_dtype": torch.float16,
+                    "low_cpu_mem_usage": True,
+                    "use_cache": True
+                }
+                
+                # 環境変数設定
+                os.environ["USE_FLASH_ATTENTION"] = "0"
+                
+                # device_mapを使わずに後でGPUに移動
+                if "device_map" in model_kwargs:
+                    del model_kwargs["device_map"]
+            
+            # 量子化設定を追加（CPU専用モードでは不要）
+            if not self.use_cpu_only and self.quantize and not self.use_direct_gpu:
+                model_kwargs["quantization_config"] = bnb_config
+            
             self.teacher_model = AutoModelForCausalLM.from_pretrained(
                 teacher_model_name, 
-                device_map=device_map,
-                torch_dtype=torch.float16,
-                quantization_config=bnb_config if quantize else None,
+                **model_kwargs
             )
+            
+            # 直接GPUモードの場合は手動でGPUに移動
+            if self.use_direct_gpu and not self.use_cpu_only:
+                logger.info(f"モデルを{device}に手動で移動します")
+                self.teacher_model = self.teacher_model.to(device)
             
             # メモリ効率化のためのグラデーション計算無効化
             for param in self.teacher_model.parameters():
@@ -155,6 +233,43 @@ class KnowledgeDistiller:
             
         except Exception as e:
             logger.error(f"Failed to load teacher model: {e}")
+            
+            # 特定のエラーパターンを検出して対処法を提案
+            error_str = str(e).lower()
+            
+            if "no module named 'triton'" in error_str:
+                logger.error("tritonモジュールが見つかりません。PyTorch nightlyを使用している可能性があります。")
+                logger.info("--use_direct_gpu オプションを使用するか、別のモデルを選択してください。")
+                
+                # 代替モデルの提案
+                alternative_models = [
+                    "elyza/elyza-japanese-llama-2-7b",
+                    "stabilityai/stablelm-base-alpha-7b",
+                    "cyberagent/calm2-7b"
+                ]
+                
+                logger.info("以下のモデルはWindows環境でも動作します:")
+                for i, model in enumerate(alternative_models):
+                    logger.info(f"{i+1}. {model}")
+                
+                choice = input("代替モデルを使用しますか？ 番号を入力するか、n で終了: ")
+                if choice.isdigit() and 1 <= int(choice) <= len(alternative_models):
+                    self.teacher_model_name = alternative_models[int(choice)-1]
+                    logger.info(f"代替モデル {self.teacher_model_name} を使用します")
+                    
+                    # 再帰的に初期化を試みる（無限ループ防止のため1回のみ）
+                    return KnowledgeDistiller(
+                        teacher_model_name=self.teacher_model_name,
+                        student_model=student_model,
+                        tokenizer=tokenizer,
+                        device=device,
+                        config=config,
+                        quantize=quantize,
+                        cpu_offload=cpu_offload,
+                        use_cpu_only=use_cpu_only
+                    )
+            
+            # その他の一般的なエラー
             raise
         
         # テンプレート
@@ -164,9 +279,78 @@ class KnowledgeDistiller:
         self.data_cache = {}
         self.max_cache_size = 1000  # 最大キャッシュサイズ
     
+    def generate_questions_if_needed(self, output_file: str, num_samples: int = 1000):
+        """質問ファイルが存在しない場合、自動生成する"""
+        if os.path.exists(output_file):
+            logger.info(f"Using existing questions file: {output_file}")
+            return output_file
+        
+        logger.info(f"Generating {num_samples} questions for distillation")
+        
+        # 様々なトピックのリスト
+        topics = [
+            "科学", "技術", "歴史", "文化", "芸術", "哲学", "心理学", "経済", "政治", "言語",
+            "教育", "環境", "健康", "宇宙", "生物学", "物理学", "数学", "文学", "音楽", "映画",
+            "スポーツ", "旅行", "料理", "ファッション", "宗教", "神話", "ビジネス", "社会問題",
+            "倫理", "テクノロジー", "人工知能", "インターネット", "プログラミング", "デザイン", "電気電子", "高校", "妹"
+        ]
+        
+        # 質問の種類
+        question_types = [
+            "{}について説明してください。",
+            "{}の歴史について教えてください。",
+            "{}の重要性とは何ですか？",
+            "{}の将来はどうなると思いますか？",
+            "{}に関する最近の進展は？",
+            "{}の利点と欠点を教えてください。",
+            "{}と{}の関係について説明できますか？",
+            "{}はどのように{}に影響を与えていますか？",
+            "なぜ{}が重要なのですか？",
+            "どうすれば{}をより良く理解できますか？",
+            "{}の主な課題は何ですか？",
+            "{}と{}を比較してください。",
+            "{}の基本原則は何ですか？",
+            "{}の実例を挙げてください。",
+            "{}に取り組む最良の方法は？"
+        ]
+        
+        questions = []
+        
+        # 基本的な質問を生成
+        for i in range(num_samples):
+            if i % 100 == 0:
+                logger.info(f"Generated {i} questions")
+                
+            # 単一トピック質問
+            if i % 3 != 0:  # 2/3の質問は単一トピック
+                topic = np.random.choice(topics)
+                q_type = np.random.choice([t for t in question_types if t.count('{}') == 1])
+                question = q_type.format(topic)
+            # 複数トピック質問
+            else:
+                topic1 = np.random.choice(topics)
+                topic2 = np.random.choice([t for t in topics if t != topic1])
+                q_type = np.random.choice([t for t in question_types if t.count('{}') == 2])
+                question = q_type.format(topic1, topic2)
+            
+            questions.append(question)
+        
+        # ファイルに保存
+        with open(output_file, 'w', encoding='utf-8') as f:
+            for q in questions:
+                f.write(q + '\n')
+        
+        logger.info(f"Generated questions saved to {output_file}")
+        return output_file
+
     def prepare_distillation_data(self, questions_file: str, output_file: str, num_samples: int = 100, batch_size: int = 4, cache_to_ram: bool = True):
         """教師モデルからの出力を生成してデータを準備（バッチ処理対応）"""
         logger.info(f"Preparing distillation data from {questions_file}")
+        
+        # 質問ファイルが存在しない場合は自動生成
+        if not os.path.exists(questions_file):
+            logger.info(f"Questions file {questions_file} not found, generating automatically")
+            questions_file = self.generate_questions_if_needed(questions_file, num_samples)
         
         # 質問を読み込む
         with open(questions_file, 'r', encoding='utf-8') as f:
@@ -176,6 +360,16 @@ class KnowledgeDistiller:
         questions = questions[:num_samples]
         
         distillation_data = []
+        
+        # PyTorch nightly版を検出した場合の特別な処理
+        is_nightly = False
+        try:
+            torch_version = torch.__version__
+            if 'dev' in torch_version or 'nightly' in torch_version:
+                is_nightly = True
+                logger.info(f"Using PyTorch nightly version {torch_version} for data generation")
+        except:
+            pass
         
         # バッチ処理で効率化
         for i in range(0, len(questions), batch_size):
@@ -187,44 +381,59 @@ class KnowledgeDistiller:
             
             # 教師モデルの出力を生成
             with torch.no_grad():
-                outputs = self.teacher_model.generate(
-                    input_ids=batch_inputs.input_ids,
-                    attention_mask=batch_inputs.attention_mask,
-                    max_length=768,  # より長い出力を許可
-                    do_sample=True,
-                    temperature=0.7,
-                    top_p=0.9,
-                    num_return_sequences=1,
-                    pad_token_id=self.tokenizer.pad_token_id if self.tokenizer.pad_token_id else self.tokenizer.eos_token_id
-                )
-            
-            # 出力をデコード
-            for j, output in enumerate(outputs):
-                teacher_output = self.tokenizer.decode(output, skip_special_tokens=True)
-                
-                item = {
-                    "input": batch_questions[j % len(batch_questions)],
-                    "output": teacher_output
+                # PyTorch nightly版/直接GPU使用モードの場合の特別な設定
+                generate_kwargs = {
+                    "input_ids": batch_inputs.input_ids,
+                    "attention_mask": batch_inputs.attention_mask,
+                    "max_length": 768,  # より長い出力を許可
+                    "do_sample": True,
+                    "temperature": 0.7,
+                    "top_p": 0.9,
+                    "num_return_sequences": 1,
+                    "pad_token_id": self.tokenizer.pad_token_id if self.tokenizer.pad_token_id else self.tokenizer.eos_token_id
                 }
                 
-                distillation_data.append(item)
+                # PyTorch nightly版での最適化
+                if is_nightly or self.use_direct_gpu:
+                    # use_cacheをオンに
+                    generate_kwargs["use_cache"] = True
+                    
+                    # メモリ効率モード
+                    if torch.cuda.is_available():
+                        with torch.cuda.amp.autocast(dtype=torch.float16):
+                            outputs = self.teacher_model.generate(**generate_kwargs)
+                    else:
+                        outputs = self.teacher_model.generate(**generate_kwargs)
+                else:
+                    outputs = self.teacher_model.generate(**generate_kwargs)
                 
-                # RAMキャッシュに保存（オプション）
-                if cache_to_ram and len(self.data_cache) < self.max_cache_size:
-                    cache_key = f"item_{len(self.data_cache)}"
-                    self.data_cache[cache_key] = item
-            
-            # バッチ処理後にメモリを解放
-            del outputs, batch_inputs
-            torch.cuda.empty_cache()
-            gc.collect()
-            
-            # 定期的に進捗を保存（万が一のクラッシュに備える）
-            if (i + batch_size) % (batch_size * 10) == 0 or (i + batch_size) >= len(questions):
-                temp_output_file = output_file + f".temp_{i+batch_size}"
-                with open(temp_output_file, 'w', encoding='utf-8') as f:
-                    json.dump(distillation_data, f, ensure_ascii=False, indent=2)
-                logger.info(f"Intermediate data saved to {temp_output_file}")
+                # 出力をデコード
+                for j, output in enumerate(outputs):
+                    teacher_output = self.tokenizer.decode(output, skip_special_tokens=True)
+                    
+                    item = {
+                        "input": batch_questions[j % len(batch_questions)],
+                        "output": teacher_output
+                    }
+                    
+                    distillation_data.append(item)
+                    
+                    # RAMキャッシュに保存（オプション）
+                    if cache_to_ram and len(self.data_cache) < self.max_cache_size:
+                        cache_key = f"item_{len(self.data_cache)}"
+                        self.data_cache[cache_key] = item
+                
+                # バッチ処理後にメモリを解放
+                del outputs, batch_inputs
+                torch.cuda.empty_cache()
+                gc.collect()
+                
+                # 定期的に進捗を保存（万が一のクラッシュに備える）
+                if (i + batch_size) % (batch_size * 10) == 0 or (i + batch_size) >= len(questions):
+                    temp_output_file = output_file + f".temp_{i+batch_size}"
+                    with open(temp_output_file, 'w', encoding='utf-8') as f:
+                        json.dump(distillation_data, f, ensure_ascii=False, indent=2)
+                    logger.info(f"Intermediate data saved to {temp_output_file}")
         
         # 結果を保存
         with open(output_file, 'w', encoding='utf-8') as f:
@@ -235,373 +444,5 @@ class KnowledgeDistiller:
         # RAM使用状況を記録
         ram_usage = psutil.virtual_memory()
         logger.info(f"RAM使用状況: {ram_usage.percent}% (使用中: {ram_usage.used/1024**3:.1f}GB, 空き: {ram_usage.available/1024**3:.1f}GB)")
-        
-        return output_file
-    
-    def distill(
-        self,
-        train_data_path: str,
-        val_data_path: str,
-        output_dir: str,
-        batch_size: int = 8,
-        num_epochs: int = 3,
-        learning_rate: float = 5e-5,
-        weight_decay: float = 0.01,
-        warmup_steps: int = 500,
-        gradient_accumulation_steps: int = 8,
-        checkpoint_every: int = 500,
-        use_ram_cache: bool = True
-    ):
-        """知識蒸留の実行（メモリ最適化）"""
-        logger.info("Starting knowledge distillation")
-        
-        # チェックポイントディレクトリの作成
-        checkpoint_dir = os.path.join(output_dir, "checkpoints")
-        os.makedirs(checkpoint_dir, exist_ok=True)
-        
-        # データローダーの準備
-        train_dataset = DistillationDataset(train_data_path, self.tokenizer)
-        val_dataset = DistillationDataset(val_data_path, self.tokenizer)
-        
-        # RAMキャッシュの活用（オプション）
-        if use_ram_cache and self.data_cache:
-            logger.info(f"Using {len(self.data_cache)} items from RAM cache")
-            # RAMキャッシュからデータを追加/置換
-            # 実装は省略
-        
-        train_loader = DataLoader(
-            train_dataset,
-            batch_size=batch_size,
-            shuffle=True,
-            num_workers=4,  # より多くのワーカー（RAM活用）
-            pin_memory=True
-        )
-        
-        val_loader = DataLoader(
-            val_dataset,
-            batch_size=batch_size,
-            shuffle=False,
-            num_workers=2,
-            pin_memory=True
-        )
-        
-        # オプティマイザとスケジューラの設定
-        optimizer = optim.AdamW(
-            self.student_model.parameters(),
-            lr=learning_rate,
-            weight_decay=weight_decay
-        )
-        
-        total_steps = len(train_loader) * num_epochs // gradient_accumulation_steps
-        scheduler = optim.lr_scheduler.OneCycleLR(
-            optimizer,
-            max_lr=learning_rate,
-            total_steps=total_steps,
-            pct_start=warmup_steps / total_steps,
-            anneal_strategy='linear'
-        )
-        
-        # モデルをデバイスに移動
-        self.student_model.to(self.device)
-        
-        # トレーニングループ
-        best_val_loss = float('inf')
-        global_step = 0
-        
-        # 学習開始時間を記録（推定完了時間の計算用）
-        start_time = datetime.now()
-        
-        for epoch in range(num_epochs):
-            logger.info(f"Epoch {epoch + 1}/{num_epochs}")
-            
-            # トレーニングフェーズ
-            self.student_model.train()
-            train_loss = 0.0
-            optimizer.zero_grad()  # 最適化ステップ前にゼロ勾配
-            
-            for batch_idx, batch in enumerate(tqdm(train_loader, desc="Training")):
-                # バッチデータをデバイスに移動
-                input_ids = batch["input_ids"].to(self.device)
-                attention_mask = batch["attention_mask"].to(self.device)
-                labels = batch["labels"].to(self.device)
-                
-                # 教師モデルの出力を取得
-                with torch.no_grad():
-                    teacher_outputs = self.teacher_model(
-                        input_ids=input_ids,
-                        attention_mask=attention_mask,
-                        return_dict=True
-                    )
-                    teacher_logits = teacher_outputs.logits
-                
-                # 生徒モデルのフォワードパス
-                student_outputs = self.student_model(input_ids)
-                
-                # 損失計算
-                # 1. 教師からの蒸留損失（KL Divergence）
-                distillation_loss = self._compute_distillation_loss(
-                    student_outputs, 
-                    teacher_logits,
-                    attention_mask,
-                    temperature=2.0
-                )
-                
-                # 2. 言語モデリング損失
-                lm_loss = F.cross_entropy(
-                    student_outputs.view(-1, student_outputs.size(-1)),
-                    labels.view(-1),
-                    ignore_index=-100
-                )
-                
-                # 損失の重み付け
-                alpha = 0.5  # 蒸留の重み
-                loss = alpha * distillation_loss + (1 - alpha) * lm_loss
-                
-                # 勾配累積による大バッチ効果
-                scaled_loss = loss / gradient_accumulation_steps
-                scaled_loss.backward()
-                
-                # 勾配累積ステップが完了したら最適化
-                if (batch_idx + 1) % gradient_accumulation_steps == 0:
-                    torch.nn.utils.clip_grad_norm_(self.student_model.parameters(), 1.0)
-                    optimizer.step()
-                    scheduler.step()
-                    optimizer.zero_grad()
-                    global_step += 1
-                    
-                    # 定期的にメモリ解放
-                    if global_step % 10 == 0:
-                        torch.cuda.empty_cache()
-                
-                train_loss += loss.item()
-                
-                # チェックポイント保存（定期的）
-                if global_step > 0 and global_step % checkpoint_every == 0:
-                    checkpoint_path = os.path.join(checkpoint_dir, f"checkpoint_step_{global_step}.pt")
-                    torch.save({
-                        'epoch': epoch,
-                        'global_step': global_step,
-                        'model_state_dict': self.student_model.state_dict(),
-                        'optimizer_state_dict': optimizer.state_dict(),
-                        'scheduler_state_dict': scheduler.state_dict(),
-                        'loss': loss.item(),
-                    }, checkpoint_path)
-                    logger.info(f"Checkpoint saved at step {global_step}")
-                    
-                    # 進捗と推定完了時間の計算
-                    elapsed = datetime.now() - start_time
-                    progress = global_step / total_steps
-                    if progress > 0:
-                        estimated_total = elapsed / progress
-                        remaining = estimated_total - elapsed
-                        estimated_completion = datetime.now() + remaining
-                        logger.info(f"Progress: {progress*100:.1f}%. Estimated completion: {estimated_completion}")
-            
-            # エポック終了後のトレーニング損失
-            avg_train_loss = train_loss / len(train_loader)
-            logger.info(f"Average training loss: {avg_train_loss:.4f}")
-            
-            # 検証フェーズ
-            self.student_model.eval()
-            val_loss = 0.0
-            
-            with torch.no_grad():
-                for batch in tqdm(val_loader, desc="Validating"):
-                    input_ids = batch["input_ids"].to(self.device)
-                    attention_mask = batch["attention_mask"].to(self.device)
-                    labels = batch["labels"].to(self.device)
-                    
-                    # 教師モデルの出力
-                    teacher_outputs = self.teacher_model(
-                        input_ids=input_ids,
-                        attention_mask=attention_mask,
-                        return_dict=True
-                    )
-                    teacher_logits = teacher_outputs.logits
-                    
-                    # 生徒モデルの出力
-                    student_outputs = self.student_model(input_ids)
-                    
-                    # 損失計算
-                    distillation_loss = self._compute_distillation_loss(
-                        student_outputs, 
-                        teacher_logits,
-                        attention_mask,
-                        temperature=2.0
-                    )
-                    
-                    lm_loss = F.cross_entropy(
-                        student_outputs.view(-1, student_outputs.size(-1)),
-                        labels.view(-1),
-                        ignore_index=-100
-                    )
-                    
-                    loss = alpha * distillation_loss + (1 - alpha) * lm_loss
-                    val_loss += loss.item()
-            
-            # 検証損失の評価
-            avg_val_loss = val_loss / len(val_loader)
-            logger.info(f"Validation loss: {avg_val_loss:.4f}")
-            
-            # モデルの保存（改善があった場合）
-            if avg_val_loss < best_val_loss:
-                best_val_loss = avg_val_loss
-                
-                # ディレクトリが存在しない場合は作成
-                os.makedirs(output_dir, exist_ok=True)
-                
-                # モデルの保存
-                model_path = os.path.join(output_dir, f"brain_model_epoch_{epoch+1}.pt")
-                torch.save(self.student_model.state_dict(), model_path)
-                logger.info(f"Model saved to {model_path}")
-                
-                # 最もよいモデルへのシンボリックリンク
-                best_model_path = os.path.join(output_dir, "brain_model_best.pt")
-                if os.path.exists(best_model_path):
-                    os.remove(best_model_path)
-                torch.save(self.student_model.state_dict(), best_model_path)
-    
-    def _compute_distillation_loss(self, student_logits, teacher_logits, attention_mask, temperature=2.0):
-        """知識蒸留損失（KL-divergence）の計算"""
-        # Softmax with temperature
-        soft_targets = F.softmax(teacher_logits / temperature, dim=-1)
-        log_probs = F.log_softmax(student_logits / temperature, dim=-1)
-        
-        # KL-divergence loss
-        loss = -(soft_targets * log_probs).sum(dim=-1) * (temperature ** 2)
-        
-        # マスクを適用（パディングトークンは無視）
-        mask = attention_mask.float()
-        loss = (loss * mask).sum() / mask.sum()
-        
-        return loss
-    
-    def generate_distillation_examples(self, num_examples=1000, output_file="distillation_data.json", batch_size=4):
-        """教師モデルから蒸留用の例を生成（バッチ処理で効率化）"""
-        logger.info(f"Generating {num_examples} distillation examples")
-        
-        # サンプル質問のテンプレート
-        question_templates = [
-            "{}とはなんですか？",
-            "{}の特徴を教えてください",
-            "{}と{}の違いは何ですか？",
-            "{}はなぜ起こりますか？",
-            "{}の歴史について教えてください",
-            "{}をするための最適な方法は？",
-            "{}についてどう思いますか？",
-            "{}が社会に与える影響は？",
-            "{}と{}の関係性について説明してください",
-            "{}を解決するためのアプローチを考えてください"
-        ]
-        
-        # トピックのリスト（質問生成用）
-        topics = [
-            "人工知能", "気候変動", "量子コンピュータ", "ブロックチェーン", "宇宙探査",
-            "再生可能エネルギー", "機械学習", "自動運転", "サイバーセキュリティ", "ロボット工学",
-            "バイオテクノロジー", "ナノテクノロジー", "仮想現実", "拡張現実", "インターネット",
-            "経済学", "心理学", "哲学", "歴史", "物理学", "化学", "生物学", "数学", "芸術", "文学"
-        ]
-        
-        # より多様なトピックを追加（ELYZA-Thinkingのスペックを継承するため）
-        additional_topics = [
-            "深層学習", "自然言語処理", "強化学習", "進化計算", "ニューラルネットワーク",
-            "認知科学", "情報理論", "暗号通貨", "量子暗号", "高速演算",
-            "脳科学", "認知バイアス", "意思決定理論", "意識", "人間の知性",
-            "創造性", "論理学", "倫理学", "メタ認知", "統計学", "確率論",
-            "システム思考", "複雑系", "創発現象", "自己組織化", "カオス理論"
-        ]
-        
-        topics.extend(additional_topics)
-        
-        # 質問生成
-        questions = []
-        for _ in range(num_examples):
-            template = np.random.choice(question_templates)
-            
-            if "{}" in template and template.count("{}") == 1:
-                topic = np.random.choice(topics)
-                question = template.format(topic)
-            elif "{}" in template and template.count("{}") == 2:
-                topic1, topic2 = np.random.choice(topics, size=2, replace=False)
-                question = template.format(topic1, topic2)
-            else:
-                question = template
-                
-            questions.append(question)
-        
-        # バッチ処理用の準備
-        distillation_data = []
-        output_dir = os.path.dirname(output_file)
-        os.makedirs(output_dir, exist_ok=True)
-        
-        # 開始時間記録
-        start_time = datetime.now()
-        
-        # バッチ処理
-        for i in range(0, len(questions), batch_size):
-            batch_questions = questions[i:i+batch_size]
-            logger.info(f"Processing batch {i//batch_size + 1}/{math.ceil(len(questions)/batch_size)}")
-            
-            batch_prompts = [self.thinking_template.format(question=q) for q in batch_questions]
-            
-            try:
-                batch_inputs = self.tokenizer(batch_prompts, return_tensors="pt", padding=True).to(self.device)
-                
-                # 教師モデルの出力を生成
-                with torch.no_grad():
-                    outputs = self.teacher_model.generate(
-                        input_ids=batch_inputs.input_ids,
-                        attention_mask=batch_inputs.attention_mask,
-                        max_length=768,  # より深い思考を促すため長めに設定
-                        do_sample=True,
-                        temperature=0.7,
-                        top_p=0.9,
-                        num_return_sequences=1,
-                        pad_token_id=self.tokenizer.pad_token_id if self.tokenizer.pad_token_id else self.tokenizer.eos_token_id
-                    )
-                
-                # 出力をデコード
-                for j, output in enumerate(outputs):
-                    teacher_output = self.tokenizer.decode(output, skip_special_tokens=True)
-                    
-                    distillation_data.append({
-                        "input": batch_questions[j % len(batch_questions)],
-                        "output": teacher_output
-                    })
-                
-                # メモリ解放
-                del outputs, batch_inputs
-                torch.cuda.empty_cache()
-                
-            except Exception as e:
-                logger.error(f"Error processing batch: {e}")
-                # エラーが発生した場合、バッチサイズを半分に縮小してリトライ
-                if batch_size > 1:
-                    logger.info("Retrying with smaller batch size")
-                    half_batch = batch_size // 2
-                    for j in range(0, len(batch_questions), half_batch):
-                        sub_batch = batch_questions[j:j+half_batch]
-                        # 小さいバッチで再処理（実際の実装はもっと複雑になります）
-                        # この例では省略
-            
-            # 定期的に中間結果を保存
-            if (i + batch_size) % (batch_size * 10) == 0 or (i + batch_size) >= len(questions):
-                temp_file = output_file + f".temp_{i+batch_size}"
-                with open(temp_file, 'w', encoding='utf-8') as f:
-                    json.dump(distillation_data, f, ensure_ascii=False, indent=2)
-                
-                # 進捗と時間見積もり
-                elapsed = datetime.now() - start_time
-                progress = (i + batch_size) / len(questions)
-                if progress > 0:
-                    estimated_total = elapsed / progress
-                    remaining = estimated_total - elapsed
-                    logger.info(f"Progress: {progress*100:.1f}%. Estimated remaining time: {remaining}")
-        
-        # 最終結果を保存
-        with open(output_file, 'w', encoding='utf-8') as f:
-            json.dump(distillation_data, f, ensure_ascii=False, indent=2)
-        
-        logger.info(f"Distillation examples saved to {output_file}")
         
         return output_file

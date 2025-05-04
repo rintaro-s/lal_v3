@@ -140,29 +140,115 @@ class BrainModel(nn.Module):
         self.correction_queue = queue.Queue()
         self.thinking_thread = None
         self.is_thinking = False
+
+        # PyTorch nightlyでの最適化をサポート
+        self.supports_nightly = True
         
-    def forward(self, input_ids):
-        embedded = self.embedding(input_ids)
-        
-        # 右脳からの直感的な出力を先に取得（早い反応）
-        right_output = self.right_brain(embedded)
-        
-        # 記憶システムからコンテキスト検索
-        memory_context = self.hippocampus.retrieve(embedded)
-        
-        # 左脳での詳細分析（時間がかかる）
-        left_output = self.left_brain(embedded, memory_context)
-        
-        # 前頭葉による統合
-        integrated = self.frontal_lobe(left_output, right_output)
-        
-        # 感情処理の統合
-        emotional = self.emotion.process(integrated)
-        
-        # 語彙に変換
-        logits = self.output_projection(emotional)
-        
-        return logits
+    def forward(self, input_ids, attention_mask=None, labels=None, return_dict=True):
+        # PyTorch nightlyでの最適化
+        try:
+            torch_version = torch.__version__
+            is_nightly = 'dev' in torch_version or 'nightly' in torch_version
+            
+            if is_nightly and torch.cuda.is_available():
+                with torch.cuda.amp.autocast(dtype=torch.float16):
+                    embedded = self.embedding(input_ids)
+                    
+                    # 右脳からの直感的な出力を先に取得（早い反応）
+                    right_output = self.right_brain(embedded)
+                    
+                    # 記憶システムからコンテキスト検索
+                    memory_context = self.hippocampus.retrieve(embedded)
+                    
+                    # 左脳での詳細分析（時間がかかる）
+                    left_output = self.left_brain(embedded, memory_context)
+                    
+                    # 前頭葉による統合
+                    integrated = self.frontal_lobe(left_output, right_output)
+                    
+                    # 感情処理の統合
+                    emotional = self.emotion.process(integrated)
+                    
+                    # 語彙に変換
+                    logits = self.output_projection(emotional)
+                    
+                    return logits
+            else:
+                embedded = self.embedding(input_ids)
+                
+                # 右脳からの直感的な出力を先に取得（早い反応）
+                right_output = self.right_brain(embedded)
+                
+                # 記憶システムからコンテキスト検索
+                memory_context = self.hippocampus.retrieve(embedded)
+                
+                # 左脳での詳細分析（時間がかかる）
+                left_output = self.left_brain(embedded, memory_context)
+                
+                # 前頭葉による統合
+                integrated = self.frontal_lobe(left_output, right_output)
+                
+                # 感情処理の統合
+                emotional = self.emotion.process(integrated)
+                
+                # 語彙に変換
+                logits = self.output_projection(emotional)
+                
+                return logits
+        except Exception as e:
+            # エラーが発生した場合は通常計算にフォールバック
+            embedded = self.embedding(input_ids)
+            
+            # 右脳からの直感的な出力を先に取得（早い反応）
+            right_output = self.right_brain(embedded)
+            
+            # 記憶システムからコンテキスト検索
+            memory_context = self.hippocampus.retrieve(embedded)
+            
+            # 左脳での詳細分析（時間がかかる）
+            left_output = self.left_brain(embedded, memory_context)
+            
+            # 前頭葉による統合
+            integrated = self.frontal_lobe(left_output, right_output)
+            
+            # 感情処理の統合
+            emotional = self.emotion.process(integrated)
+            
+            # 語彙に変換
+            logits = self.output_projection(emotional)
+            
+            return logits
+    
+    def generate(self, input_ids, attention_mask=None, **kwargs):
+        """テキスト生成メソッド（HuggingFaceのインターフェースに互換）"""
+        is_nightly = False
+        try:
+            torch_version = torch.__version__
+            is_nightly = 'dev' in torch_version or 'nightly' in torch_version
+        except:
+            pass
+            
+        # 直接GPUを使用する最適化
+        if is_nightly and torch.cuda.is_available():
+            # PyTorch nightlyでは直接GPU計算を使用
+            with torch.cuda.amp.autocast(dtype=torch.float16):
+                embedded = self.embedding(input_ids)
+                right_output = self.right_brain(embedded)
+                memory_context = self.hippocampus.retrieve(embedded)
+                left_output = self.left_brain(embedded, memory_context)
+                integrated = self.frontal_lobe(left_output, right_output)
+                emotional = self.emotion.process(integrated)
+                logits = self.output_projection(emotional)
+                return logits
+        else:
+            embedded = self.embedding(input_ids)
+            right_output = self.right_brain(embedded)
+            memory_context = self.hippocampus.retrieve(embedded)
+            left_output = self.left_brain(embedded, memory_context)
+            integrated = self.frontal_lobe(left_output, right_output)
+            emotional = self.emotion.process(integrated)
+            logits = self.output_projection(emotional)
+            return logits
     
     def start_thinking(self, input_ids):
         """バックグラウンドで深い思考プロセスを開始"""
