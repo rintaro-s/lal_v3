@@ -446,3 +446,101 @@ class KnowledgeDistiller:
         logger.info(f"RAM使用状況: {ram_usage.percent}% (使用中: {ram_usage.used/1024**3:.1f}GB, 空き: {ram_usage.available/1024**3:.1f}GB)")
         
         return output_file
+
+    def distill(self, train_data_path, val_data_path, output_dir, batch_size=4, num_epochs=3,
+                gradient_accumulation_steps=8, use_ram_cache=True, checkpoint_every=500, config=None):
+        """知識蒸留の実行"""
+        logger.info("Starting knowledge distillation process")
+        
+        # データセットの準備
+        train_dataset = DistillationDataset(train_data_path, self.tokenizer)
+        val_dataset = DistillationDataset(val_data_path, self.tokenizer)
+        
+        train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+        val_loader = DataLoader(val_dataset, batch_size=batch_size)
+        
+        # 最適化設定
+        optimizer = optim.AdamW(self.student_model.parameters(), lr=5e-5)
+        scheduler = None  # スケジューラを使用する場合は設定
+        
+        # トレーニングループ
+        best_val_loss = float('inf')
+        best_model_state = None
+        best_epoch = 0
+        
+        for epoch in range(num_epochs):
+            logger.info(f"Epoch {epoch+1}/{num_epochs}")
+            
+            # トレーニング
+            self.student_model.train()
+            train_loss = 0.0
+            
+            for step, batch in enumerate(train_loader):
+                input_ids = batch["input_ids"].to(self.device)
+                attention_mask = batch["attention_mask"].to(self.device)
+                labels = batch["labels"].to(self.device)
+                
+                outputs = self.student_model(input_ids=input_ids, attention_mask=attention_mask, labels=labels)
+                loss = outputs.loss / gradient_accumulation_steps
+                loss.backward()
+                
+                train_loss += loss.item()
+                
+                if (step + 1) % gradient_accumulation_steps == 0:
+                    optimizer.step()
+                    optimizer.zero_grad()
+                
+                # チェックポイントの保存
+                if (step + 1) % checkpoint_every == 0:
+                    checkpoint_path = os.path.join(output_dir, f"checkpoint_step_{step+1}.pt")
+                    torch.save({
+                        'step': step + 1,
+                        'model_state_dict': self.student_model.state_dict(),
+                        'optimizer_state_dict': optimizer.state_dict(),
+                        'scheduler_state_dict': scheduler.state_dict() if scheduler else None,
+                        'train_loss': train_loss / (step + 1),
+                        'model_config': config,  # 設定情報を保存
+                    }, checkpoint_path)
+                    logger.info(f"Checkpoint saved at {checkpoint_path}")
+            
+            # 検証
+            self.student_model.eval()
+            val_loss = 0.0
+            
+            with torch.no_grad():
+                for batch in val_loader:
+                    input_ids = batch["input_ids"].to(self.device)
+                    attention_mask = batch["attention_mask"].to(self.device)
+                    labels = batch["labels"].to(self.device)
+                    
+                    outputs = self.student_model(input_ids=input_ids, attention_mask=attention_mask, labels=labels)
+                    val_loss += outputs.loss.item()
+            
+            val_loss /= len(val_loader)
+            logger.info(f"Validation loss: {val_loss}")
+            
+            # ベストモデルの更新
+            if val_loss < best_val_loss:
+                best_val_loss = val_loss
+                best_model_state = self.student_model.state_dict()
+                best_epoch = epoch + 1
+            
+            # モデルの保存
+            torch.save({
+                'epoch': epoch + 1,
+                'model_state_dict': self.student_model.state_dict(),
+                'optimizer_state_dict': optimizer.state_dict(),
+                'scheduler_state_dict': scheduler.state_dict() if scheduler else None,
+                'val_loss': val_loss,
+                'model_config': config,  # 設定情報を保存
+            }, os.path.join(output_dir, f'brain_model_epoch_{epoch+1}.pt'))
+        
+        # ベストモデルの保存
+        best_model_path = os.path.join(output_dir, "best_brain_model.pt")
+        torch.save({
+            'epoch': best_epoch,
+            'model_state_dict': best_model_state,
+            'val_loss': best_val_loss,
+            'model_config': config,  # 設定情報を保存
+        }, best_model_path)
+        logger.info(f"Best model saved at {best_model_path}")

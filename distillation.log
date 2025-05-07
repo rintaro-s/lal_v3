@@ -454,3 +454,260 @@ No module named 'triton'
 2025-05-05 00:19:12,821 - distillation - INFO - Using PyTorch nightly version 2.7.0.dev20250309+cu128 for data generation
 2025-05-05 00:19:12,821 - distillation - INFO - Processing batch 1/1000
 2025-05-05 00:38:38,045 - distillation - INFO - Processing batch 2/1000
+2025-05-05 19:14:17,645 - __main__ - INFO - Starting knowledge distillation process
+2025-05-05 19:14:17,650 - __main__ - INFO - RAM: 使用中 14.1GB / 95.4GB (14.8%)
+2025-05-05 19:14:17,837 - __main__ - INFO - GPU 0 (NVIDIA GeForce RTX 5070 Ti): 確保 0.0GB / 予約 0.0GB / 合計 15.9GB
+2025-05-05 19:14:17,837 - __main__ - INFO - Windows環境を検出しました
+2025-05-05 19:14:17,837 - __main__ - WARNING - WindowsでQwen2モデルを使用する場合はwindows_modeを推奨します
+2025-05-05 19:14:25,984 - __main__ - INFO - windows_modeを有効にしました
+2025-05-05 19:14:25,985 - __main__ - INFO - PyTorch nightly版を検出: 2.7.0.dev20250309+cu128
+2025-05-05 19:14:25,985 - __main__ - WARNING - PyTorch nightly版ではGPU最適化ライブラリが使用できない場合があります
+2025-05-05 19:14:25,985 - __main__ - INFO - --use_direct_gpu オプションを使用することを推奨します
+2025-05-05 19:14:30,172 - __main__ - INFO - Using device: cuda
+2025-05-05 19:14:30,172 - __main__ - INFO - GPU: NVIDIA GeForce RTX 5070 Ti
+2025-05-05 19:14:30,172 - __main__ - INFO - CUDA Version: 12.8
+2025-05-05 19:14:30,173 - __main__ - INFO - GPU Memory: 15.9 GB
+2025-05-05 19:14:30,173 - __main__ - INFO - Loading tokenizer for elyza/ELYZA-Thinking-1.0-Qwen-32B
+2025-05-05 19:14:30,741 - __main__ - INFO - Initializing student model
+2025-05-05 19:14:31,582 - distillation - INFO - PyTorch nightly版を検出: 2.7.0.dev20250309+cu128
+2025-05-05 19:14:31,588 - distillation - INFO - RAM使用状況: 15.9% (使用中: 15.2GB, 空き: 80.2GB)
+2025-05-05 19:14:31,588 - distillation - INFO - Loading teacher model: elyza/ELYZA-Thinking-1.0-Qwen-32B
+2025-05-05 19:14:31,588 - distillation - INFO - GPU直接アクセスモードで実行します（最適化ライブラリ未使用）
+2025-05-05 19:14:31,589 - distillation - INFO - Windows互換モードで実行しています
+2025-05-05 19:14:33,962 - distillation - INFO - xformersが使用可能です
+2025-05-05 19:14:33,963 - distillation - INFO - Configuring 4-bit quantization for teacher model
+2025-05-05 19:14:33,971 - distillation - INFO - Using automatic device mapping with CPU offloading
+2025-05-05 19:15:20,838 - distillation - INFO - モデルをcudaに手動で移動します
+2025-05-05 19:16:03,972 - distillation - INFO - Teacher model loaded successfully
+2025-05-05 19:16:03,974 - __main__ - INFO - Generating 5000 distillation examples
+2025-05-05 19:16:03,975 - distillation - INFO - Preparing distillation data from questions.txt
+2025-05-05 19:16:03,976 - distillation - INFO - Questions file questions.txt not found, generating automatically
+2025-05-05 19:16:03,977 - distillation - INFO - Generating 4000 questions for distillation
+2025-05-05 19:16:03,977 - distillation - INFO - Generated 0 questions
+2025-05-05 19:16:03,982 - distillation - INFO - Generated 100 questions
+2025-05-05 19:16:03,984 - distillation - INFO - Generated 200 questions
+2025-05-05 19:16:03,986 - distillation - INFO - Generated 300 questions
+2025-05-05 19:16:03,989 - distillation - INFO - Generated 400 questions
+2025-05-05 19:16:03,991 - distillation - INFO - Generated 500 questions
+2025-05-05 19:16:03,994 - distillation - INFO - Generated 600 questions
+2025-05-05 19:16:03,995 - distillation - INFO - Generated 700 questions
+2025-05-05 19:16:03,997 - distillation - INFO - Generated 800 questions
+2025-05-05 19:16:04,000 - distillation - INFO - Generated 900 questions
+2025-05-05 19:16:04,002 - distillation - INFO - Generated 1000 questions
+2025-05-05 19:16:04,004 - distillation - INFO - Generated 1100 questions
+2025-05-05 19:16:04,006 - distillation - INFO - Generated 1200 questions
+2025-05-05 19:16:04,007 - distillation - INFO - Generated 1300 questions
+2025-05-05 19:16:04,009 - distillation - INFO - Generated 1400 questions
+2025-05-05 19:16:04,015 - distillation - INFO - Generated 1500 questions
+2025-05-05 19:16:04,017 - distillation - INFO - Generated 1600 questions
+2025-05-05 19:16:04,019 - distillation - INFO - Generated 1700 questions
+2025-05-05 19:16:04,022 - distillation - INFO - Generated 1800 questions
+2025-05-05 19:16:04,024 - distillation - INFO - Generated 1900 questions
+2025-05-05 19:16:04,026 - distillation - INFO - Generated 2000 questions
+2025-05-05 19:16:04,028 - distillation - INFO - Generated 2100 questions
+2025-05-05 19:16:04,034 - distillation - INFO - Generated 2200 questions
+2025-05-05 19:16:04,036 - distillation - INFO - Generated 2300 questions
+2025-05-05 19:16:04,037 - distillation - INFO - Generated 2400 questions
+2025-05-05 19:16:04,039 - distillation - INFO - Generated 2500 questions
+2025-05-05 19:16:04,041 - distillation - INFO - Generated 2600 questions
+2025-05-05 19:16:04,043 - distillation - INFO - Generated 2700 questions
+2025-05-05 19:16:04,045 - distillation - INFO - Generated 2800 questions
+2025-05-05 19:16:04,046 - distillation - INFO - Generated 2900 questions
+2025-05-05 19:16:04,048 - distillation - INFO - Generated 3000 questions
+2025-05-05 19:16:04,050 - distillation - INFO - Generated 3100 questions
+2025-05-05 19:16:04,052 - distillation - INFO - Generated 3200 questions
+2025-05-05 19:16:04,054 - distillation - INFO - Generated 3300 questions
+2025-05-05 19:16:04,056 - distillation - INFO - Generated 3400 questions
+2025-05-05 19:16:04,058 - distillation - INFO - Generated 3500 questions
+2025-05-05 19:16:04,061 - distillation - INFO - Generated 3600 questions
+2025-05-05 19:16:04,062 - distillation - INFO - Generated 3700 questions
+2025-05-05 19:16:04,064 - distillation - INFO - Generated 3800 questions
+2025-05-05 19:16:04,065 - distillation - INFO - Generated 3900 questions
+2025-05-05 19:16:04,069 - distillation - INFO - Generated questions saved to questions.txt
+2025-05-05 19:16:04,070 - distillation - INFO - Using PyTorch nightly version 2.7.0.dev20250309+cu128 for data generation
+2025-05-05 19:16:04,070 - distillation - INFO - Processing batch 1/1000
+2025-05-05 19:18:38,923 - __main__ - INFO - ガベージコレクションを実行してメモリを解放しました
+2025-05-05 19:37:24,506 - __main__ - INFO - Starting knowledge distillation process
+2025-05-05 19:37:24,517 - __main__ - INFO - RAM: 使用中 10.4GB / 95.4GB (10.9%)
+2025-05-05 19:37:24,541 - __main__ - INFO - GPU 0 (NVIDIA GeForce RTX 5070 Ti): 確保 0.0GB / 予約 0.0GB / 合計 15.9GB
+2025-05-05 19:37:24,541 - __main__ - INFO - Windows環境を検出しました
+2025-05-05 19:37:24,542 - __main__ - WARNING - WindowsでQwen2モデルを使用する場合はwindows_modeを推奨します
+2025-05-05 19:37:39,543 - __main__ - INFO - windows_modeを有効にしました
+2025-05-05 19:37:39,543 - __main__ - INFO - PyTorch nightly版を検出: 2.7.0.dev20250309+cu128
+2025-05-05 19:37:39,544 - __main__ - WARNING - PyTorch nightly版ではGPU最適化ライブラリが使用できない場合があります
+2025-05-05 19:37:39,544 - __main__ - INFO - --use_direct_gpu オプションを使用することを推奨します
+2025-05-05 19:37:43,980 - __main__ - INFO - Using device: cuda
+2025-05-05 19:37:43,980 - __main__ - INFO - GPU: NVIDIA GeForce RTX 5070 Ti
+2025-05-05 19:37:43,981 - __main__ - INFO - CUDA Version: 12.8
+2025-05-05 19:37:43,981 - __main__ - INFO - GPU Memory: 15.9 GB
+2025-05-05 19:37:43,981 - __main__ - INFO - Loading tokenizer for elyza/ELYZA-Thinking-1.0-Qwen-32B
+2025-05-05 19:37:44,867 - __main__ - INFO - Initializing student model
+2025-05-05 19:37:45,706 - distillation - INFO - PyTorch nightly版を検出: 2.7.0.dev20250309+cu128
+2025-05-05 19:37:45,717 - distillation - INFO - RAM使用状況: 12.0% (使用中: 11.5GB, 空き: 83.9GB)
+2025-05-05 19:37:45,718 - distillation - INFO - Loading teacher model: elyza/ELYZA-Thinking-1.0-Qwen-32B
+2025-05-05 19:37:45,718 - distillation - INFO - GPU直接アクセスモードで実行します（最適化ライブラリ未使用）
+2025-05-05 19:37:45,719 - distillation - INFO - Windows互換モードで実行しています
+2025-05-05 19:37:47,683 - distillation - INFO - xformersが使用可能です
+2025-05-05 19:37:47,684 - distillation - INFO - Configuring 4-bit quantization for teacher model
+2025-05-05 19:37:47,686 - distillation - INFO - Using automatic device mapping with CPU offloading
+2025-05-05 19:38:27,984 - distillation - INFO - モデルをcudaに手動で移動します
+2025-05-05 19:39:11,408 - distillation - INFO - Teacher model loaded successfully
+2025-05-05 19:39:11,421 - __main__ - INFO - Generating 5000 distillation examples
+2025-05-05 19:39:11,422 - distillation - INFO - Preparing distillation data from questions.txt
+2025-05-05 19:39:11,428 - distillation - INFO - Using PyTorch nightly version 2.7.0.dev20250309+cu128 for data generation
+2025-05-05 19:39:11,428 - distillation - INFO - Processing batch 1/1000
+2025-05-05 19:57:18,123 - distillation - INFO - Processing batch 2/1000
+2025-05-05 20:15:05,750 - distillation - INFO - Processing batch 3/1000
+2025-05-05 20:32:52,518 - distillation - INFO - Processing batch 4/1000
+2025-05-05 20:50:39,044 - distillation - INFO - Processing batch 5/1000
+2025-05-05 21:08:24,119 - distillation - INFO - Processing batch 6/1000
+2025-05-05 21:26:09,554 - distillation - INFO - Processing batch 7/1000
+2025-05-05 21:44:03,229 - distillation - INFO - Processing batch 8/1000
+2025-05-05 22:01:57,091 - distillation - INFO - Processing batch 9/1000
+2025-05-05 22:19:02,389 - distillation - INFO - Processing batch 10/1000
+2025-05-05 22:37:00,271 - distillation - INFO - Intermediate data saved to ./models\train_data.json.temp_40
+2025-05-05 22:37:00,272 - distillation - INFO - Processing batch 11/1000
+2025-05-05 22:55:04,181 - distillation - INFO - Processing batch 12/1000
+2025-05-05 23:13:06,050 - distillation - INFO - Processing batch 13/1000
+2025-05-05 23:31:00,684 - distillation - INFO - Processing batch 14/1000
+2025-05-05 23:49:00,736 - distillation - INFO - Processing batch 15/1000
+2025-05-06 00:07:04,566 - distillation - INFO - Processing batch 16/1000
+2025-05-06 00:25:07,218 - distillation - INFO - Processing batch 17/1000
+2025-05-06 00:43:08,792 - distillation - INFO - Processing batch 18/1000
+2025-05-06 01:01:12,135 - distillation - INFO - Processing batch 19/1000
+2025-05-06 01:19:10,856 - distillation - INFO - Processing batch 20/1000
+2025-05-06 01:37:10,916 - distillation - INFO - Intermediate data saved to ./models\train_data.json.temp_80
+2025-05-06 01:37:10,916 - distillation - INFO - Processing batch 21/1000
+2025-05-06 01:55:11,228 - distillation - INFO - Processing batch 22/1000
+2025-05-06 02:13:01,497 - distillation - INFO - Processing batch 23/1000
+2025-05-06 02:31:00,071 - distillation - INFO - Processing batch 24/1000
+2025-05-06 02:49:03,913 - distillation - INFO - Processing batch 25/1000
+2025-05-06 03:06:59,700 - distillation - INFO - Processing batch 26/1000
+2025-05-06 03:25:02,820 - distillation - INFO - Processing batch 27/1000
+2025-05-06 03:43:02,734 - distillation - INFO - Processing batch 28/1000
+2025-05-06 04:01:01,968 - distillation - INFO - Processing batch 29/1000
+2025-05-06 04:19:03,270 - distillation - INFO - Processing batch 30/1000
+2025-05-06 04:37:02,355 - distillation - INFO - Intermediate data saved to ./models\train_data.json.temp_120
+2025-05-06 04:37:02,356 - distillation - INFO - Processing batch 31/1000
+2025-05-06 04:54:59,146 - distillation - INFO - Processing batch 32/1000
+2025-05-06 05:12:50,872 - distillation - INFO - Processing batch 33/1000
+2025-05-06 05:30:46,946 - distillation - INFO - Processing batch 34/1000
+2025-05-06 05:48:38,766 - distillation - INFO - Processing batch 35/1000
+2025-05-06 06:06:32,509 - distillation - INFO - Processing batch 36/1000
+2025-05-06 06:24:28,888 - distillation - INFO - Processing batch 37/1000
+2025-05-06 06:42:24,129 - distillation - INFO - Processing batch 38/1000
+2025-05-06 07:00:20,255 - distillation - INFO - Processing batch 39/1000
+2025-05-06 07:18:15,042 - distillation - INFO - Processing batch 40/1000
+2025-05-06 07:36:08,224 - distillation - INFO - Intermediate data saved to ./models\train_data.json.temp_160
+2025-05-06 07:36:08,224 - distillation - INFO - Processing batch 41/1000
+2025-05-06 07:54:03,341 - distillation - INFO - Processing batch 42/1000
+2025-05-06 08:11:58,898 - distillation - INFO - Processing batch 43/1000
+2025-05-06 08:29:58,144 - distillation - INFO - Processing batch 44/1000
+2025-05-06 08:47:54,606 - distillation - INFO - Processing batch 45/1000
+2025-05-06 09:05:49,136 - distillation - INFO - Processing batch 46/1000
+2025-05-06 09:23:38,117 - distillation - INFO - Processing batch 47/1000
+2025-05-06 09:41:49,085 - distillation - INFO - Processing batch 48/1000
+2025-05-06 10:00:04,392 - distillation - INFO - Processing batch 49/1000
+2025-05-06 10:17:59,313 - distillation - INFO - Processing batch 50/1000
+2025-05-06 10:35:54,840 - distillation - INFO - Intermediate data saved to ./models\train_data.json.temp_200
+2025-05-06 10:35:54,840 - distillation - INFO - Processing batch 51/1000
+2025-05-06 10:53:45,497 - distillation - INFO - Processing batch 52/1000
+2025-05-06 11:11:28,831 - distillation - INFO - Processing batch 53/1000
+2025-05-06 11:29:22,668 - distillation - INFO - Processing batch 54/1000
+2025-05-06 11:47:17,464 - distillation - INFO - Processing batch 55/1000
+2025-05-06 12:05:15,315 - distillation - INFO - Processing batch 56/1000
+2025-05-06 12:23:22,105 - distillation - INFO - Processing batch 57/1000
+2025-05-06 12:41:22,010 - distillation - INFO - Processing batch 58/1000
+2025-05-06 12:59:17,226 - distillation - INFO - Processing batch 59/1000
+2025-05-06 13:17:12,326 - distillation - INFO - Processing batch 60/1000
+2025-05-06 13:35:15,258 - distillation - INFO - Intermediate data saved to ./models\train_data.json.temp_240
+2025-05-06 13:35:15,258 - distillation - INFO - Processing batch 61/1000
+2025-05-06 13:53:14,368 - distillation - INFO - Processing batch 62/1000
+2025-05-06 14:11:34,199 - distillation - INFO - Processing batch 63/1000
+2025-05-06 14:30:00,707 - distillation - INFO - Processing batch 64/1000
+2025-05-06 14:48:23,825 - distillation - INFO - Processing batch 65/1000
+2025-05-06 15:06:47,462 - distillation - INFO - Processing batch 66/1000
+2025-05-06 15:25:04,602 - distillation - INFO - Processing batch 67/1000
+2025-05-06 15:43:28,362 - distillation - INFO - Processing batch 68/1000
+2025-05-06 16:01:49,094 - distillation - INFO - Processing batch 69/1000
+2025-05-06 16:20:08,201 - distillation - INFO - Processing batch 70/1000
+2025-05-06 16:38:17,477 - distillation - INFO - Intermediate data saved to ./models\train_data.json.temp_280
+2025-05-06 16:38:17,477 - distillation - INFO - Processing batch 71/1000
+2025-05-06 16:56:31,797 - distillation - INFO - Processing batch 72/1000
+2025-05-06 17:14:50,958 - distillation - INFO - Processing batch 73/1000
+2025-05-06 17:33:00,482 - distillation - INFO - Processing batch 74/1000
+2025-05-06 17:51:15,509 - distillation - INFO - Processing batch 75/1000
+2025-05-06 18:09:28,788 - distillation - INFO - Processing batch 76/1000
+2025-05-06 18:27:33,361 - distillation - INFO - Processing batch 77/1000
+2025-05-06 18:45:40,977 - distillation - INFO - Processing batch 78/1000
+2025-05-06 19:03:46,914 - distillation - INFO - Processing batch 79/1000
+2025-05-06 19:21:56,799 - distillation - INFO - Processing batch 80/1000
+2025-05-06 19:40:11,666 - distillation - INFO - Intermediate data saved to ./models\train_data.json.temp_320
+2025-05-06 19:40:11,666 - distillation - INFO - Processing batch 81/1000
+2025-05-06 19:58:24,708 - distillation - INFO - Processing batch 82/1000
+2025-05-06 20:16:36,995 - distillation - INFO - Processing batch 83/1000
+2025-05-06 20:34:42,898 - distillation - INFO - Processing batch 84/1000
+2025-05-06 20:52:50,202 - distillation - INFO - Processing batch 85/1000
+2025-05-06 21:10:59,550 - distillation - INFO - Processing batch 86/1000
+2025-05-06 21:29:01,038 - distillation - INFO - Processing batch 87/1000
+2025-05-06 21:46:56,073 - distillation - INFO - Processing batch 88/1000
+2025-05-06 22:04:45,909 - distillation - INFO - Processing batch 89/1000
+2025-05-06 22:22:47,506 - distillation - INFO - Processing batch 90/1000
+2025-05-06 22:40:36,106 - distillation - INFO - Intermediate data saved to ./models\train_data.json.temp_360
+2025-05-06 22:40:36,106 - distillation - INFO - Processing batch 91/1000
+2025-05-06 22:58:29,342 - distillation - INFO - Processing batch 92/1000
+2025-05-06 23:16:19,824 - distillation - INFO - Processing batch 93/1000
+2025-05-06 23:34:17,410 - distillation - INFO - Processing batch 94/1000
+2025-05-06 23:52:11,085 - distillation - INFO - Processing batch 95/1000
+2025-05-07 00:10:09,091 - distillation - INFO - Processing batch 96/1000
+2025-05-07 00:28:01,853 - distillation - INFO - Processing batch 97/1000
+2025-05-07 00:45:52,383 - distillation - INFO - Processing batch 98/1000
+2025-05-07 01:03:48,757 - distillation - INFO - Processing batch 99/1000
+2025-05-07 01:21:45,692 - distillation - INFO - Processing batch 100/1000
+2025-05-07 01:39:42,952 - distillation - INFO - Intermediate data saved to ./models\train_data.json.temp_400
+2025-05-07 01:39:42,952 - distillation - INFO - Processing batch 101/1000
+2025-05-07 01:57:34,036 - distillation - INFO - Processing batch 102/1000
+2025-05-07 02:15:26,233 - distillation - INFO - Processing batch 103/1000
+2025-05-07 02:33:21,448 - distillation - INFO - Processing batch 104/1000
+2025-05-07 02:51:09,351 - distillation - INFO - Processing batch 105/1000
+2025-05-07 03:09:00,313 - distillation - INFO - Processing batch 106/1000
+2025-05-07 03:26:57,110 - distillation - INFO - Processing batch 107/1000
+2025-05-07 03:44:50,271 - distillation - INFO - Processing batch 108/1000
+2025-05-07 04:02:40,550 - distillation - INFO - Processing batch 109/1000
+2025-05-07 04:20:36,906 - distillation - INFO - Processing batch 110/1000
+2025-05-07 04:38:30,735 - distillation - INFO - Intermediate data saved to ./models\train_data.json.temp_440
+2025-05-07 04:38:30,735 - distillation - INFO - Processing batch 111/1000
+2025-05-07 04:56:24,160 - distillation - INFO - Processing batch 112/1000
+2025-05-07 05:14:18,763 - distillation - INFO - Processing batch 113/1000
+2025-05-07 05:32:12,446 - distillation - INFO - Processing batch 114/1000
+2025-05-07 05:50:00,351 - distillation - INFO - Processing batch 115/1000
+2025-05-07 06:07:51,306 - distillation - INFO - Processing batch 116/1000
+2025-05-07 06:25:47,696 - distillation - INFO - Processing batch 117/1000
+2025-05-07 06:43:40,886 - distillation - INFO - Processing batch 118/1000
+2025-05-07 07:02:13,096 - distillation - INFO - Processing batch 119/1000
+2025-05-07 07:20:36,455 - distillation - INFO - Processing batch 120/1000
+2025-05-07 07:38:58,804 - distillation - INFO - Intermediate data saved to ./models\train_data.json.temp_480
+2025-05-07 07:38:58,805 - distillation - INFO - Processing batch 121/1000
+2025-05-07 07:57:25,406 - distillation - INFO - Processing batch 122/1000
+2025-05-07 08:15:50,119 - distillation - INFO - Processing batch 123/1000
+2025-05-07 08:34:14,433 - distillation - INFO - Processing batch 124/1000
+2025-05-07 08:52:33,865 - distillation - INFO - Processing batch 125/1000
+2025-05-07 09:10:34,732 - distillation - INFO - Processing batch 126/1000
+2025-05-07 09:28:33,676 - distillation - INFO - Processing batch 127/1000
+2025-05-07 09:46:38,534 - distillation - INFO - Processing batch 128/1000
+2025-05-07 10:04:41,866 - distillation - INFO - Processing batch 129/1000
+2025-05-07 10:22:42,467 - distillation - INFO - Processing batch 130/1000
+2025-05-07 10:40:42,439 - distillation - INFO - Intermediate data saved to ./models\train_data.json.temp_520
+2025-05-07 10:40:42,439 - distillation - INFO - Processing batch 131/1000
+2025-05-07 10:58:42,599 - distillation - INFO - Processing batch 132/1000
+2025-05-07 11:16:46,743 - distillation - INFO - Processing batch 133/1000
+2025-05-07 11:35:55,770 - distillation - INFO - Processing batch 134/1000
+2025-05-07 12:08:20,362 - distillation - INFO - Processing batch 135/1000
+2025-05-07 12:35:58,525 - distillation - INFO - Processing batch 136/1000
+2025-05-07 13:03:44,376 - distillation - INFO - Processing batch 137/1000
+2025-05-07 13:31:36,560 - distillation - INFO - Processing batch 138/1000
+2025-05-07 14:00:22,402 - distillation - INFO - Processing batch 139/1000
+2025-05-07 14:28:32,200 - distillation - INFO - Processing batch 140/1000
+2025-05-07 14:57:37,643 - distillation - INFO - Intermediate data saved to ./models\train_data.json.temp_560
+2025-05-07 14:57:37,644 - distillation - INFO - Processing batch 141/1000
+2025-05-07 15:20:30,480 - __main__ - INFO - ガベージコレクションを実行してメモリを解放しました

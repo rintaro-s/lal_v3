@@ -4,6 +4,7 @@ import threading
 import queue
 import os
 import logging
+import gc
 from typing import List, Dict, Optional, Callable
 from transformers import AutoTokenizer
 
@@ -36,43 +37,88 @@ class InferenceEngine:
         self,
         model_path: str,
         tokenizer_name: str,
-        device: str = "cuda",
+        device: str = None,
         stream_output: bool = True
     ):
-        self.device = torch.device(device if torch.cuda.is_available() else "cpu")
-        logger.info(f"Using device: {self.device}")
+        self.logger = logging.getLogger(__name__)
+        self.stream_output = stream_output
+        
+        # デバイスの設定
+        if device:
+            self.device = device
+        else:
+            self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        
+        self.logger.info(f"Using device: {self.device}")
+        
+        # モデルの読み込み
+        self.logger.info(f"Loading model from {model_path}")
+        try:
+            # Hugging Faceモデルの場合
+            if not os.path.exists(model_path) and '/' in model_path:
+                from huggingface_hub import snapshot_download
+                model_path = snapshot_download(repo_id=model_path)
+                self.logger.info(f"Downloaded model from Hugging Face to {model_path}")
+            
+            if os.path.isdir(model_path):
+                # Hugging Face形式のモデル
+                from transformers import AutoConfig
+                config = AutoConfig.from_pretrained(model_path)
+                self.model = BrainModel(
+                    vocab_size=config.vocab_size,
+                    embedding_dim=config.hidden_size,
+                    hidden_dim=config.intermediate_size,
+                    memory_size=1000  # デフォルト値
+                )
+                self.model.load_state_dict(torch.load(os.path.join(model_path, "pytorch_model.bin")))
+            else:
+                # 通常のPyTorch形式モデル
+                checkpoint = torch.load(model_path, map_location=self.device)
+                
+                # モデルの初期化に必要な情報を取得
+                self.model = BrainModel(
+                    vocab_size=None,  # トークナイザーから取得するため後で設定
+                    embedding_dim=768,
+                    hidden_dim=1024,
+                    memory_size=1000
+                )
+                
+                # モデルの状態を読み込む
+                self.model.load_state_dict(checkpoint['model_state_dict'])
+                self.logger.info(f"Model loaded from checkpoint at epoch {checkpoint.get('epoch', 'unknown')}")
+        except Exception as e:
+            self.logger.error(f"Error loading model: {e}")
+            raise RuntimeError(f"Failed to load model from {model_path}: {e}")
         
         # トークナイザーの読み込み
-        logger.info(f"Loading tokenizer: {tokenizer_name}")
-        self.tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
+        self.logger.info(f"Loading tokenizer: {tokenizer_name}")
+        try:
+            self.tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
+            if self.tokenizer.pad_token is None:
+                self.tokenizer.pad_token = self.tokenizer.eos_token
+                
+            # モデルの語彙サイズを設定 (必要な場合)
+            if hasattr(self.model, 'resize_token_embeddings'):
+                self.model.resize_token_embeddings(len(self.tokenizer))
+        except Exception as e:
+            self.logger.error(f"Error loading tokenizer: {e}")
+            raise RuntimeError(f"Failed to load tokenizer {tokenizer_name}: {e}")
         
-        # ボキャブラリサイズ
-        vocab_size = len(self.tokenizer)
-        
-        # モデルの初期化
-        logger.info(f"Initializing brain model")
-        self.model = BrainModel(
-            vocab_size=vocab_size,
-            embedding_dim=768,
-            hidden_dim=1024,
-            memory_size=1000
-        )
-        
-        # モデルの重みを読み込む
-        logger.info(f"Loading model weights from {model_path}")
-        self.model.load_state_dict(torch.load(model_path, map_location=self.device))
+        # モデルをデバイスに移動
         self.model.to(self.device)
         self.model.eval()
         
-        # 記憶システムの初期化
-        self.memory_system = MemorySystem(embedding_dim=768)
+        # メモリシステムの初期化
+        try:
+            self.memory_system = MemorySystem(embedding_dim=768)
+        except Exception as e:
+            self.logger.error(f"Error initializing memory system: {e}")
+            self.logger.warning("Will continue without memory system")
+            self.memory_system = None
         
         # 思考生成器と出力マネージャー
         self.thought_generator = ThoughtGenerator(self.model, self.tokenizer, self.device)
         self.output_manager = RealTimeOutputManager(self.thought_generator)
-        
-        # ストリーミング設定
-        self.stream_output = stream_output
         
         # 推論状態
         self.is_generating = False
@@ -162,7 +208,8 @@ class InferenceEngine:
             combined_embedding = (input_embedding + output_embedding) / 2
             
             importance = 0.7  # デフォルトの重要度
-            self.memory_system.process_input(combined_embedding, importance, tag="conversation")
+            if self.memory_system:
+                self.memory_system.process_input(combined_embedding, importance, tag="conversation")
             
             # 終了処理
             if self.stream_output:
@@ -195,6 +242,7 @@ class InferenceEngine:
         return response
     
     def maintenance(self):
-        """メンテナンス処理を実行"""
-        # 記憶システムのメンテナンス
-        self.memory_system.maintenance()
+        """メンテナンス処理 - メモリ解放など"""
+        gc.collect()
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()

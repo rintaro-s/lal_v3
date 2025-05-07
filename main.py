@@ -5,9 +5,11 @@ import torch
 import logging
 import numpy as np
 import psutil
-from typing import Dict
+import gc
+from typing import Dict, Optional, List
 from importlib.metadata import version
 from datetime import datetime
+from importlib import import_module
 
 # バージョン確認と修正のため、transformersのインポート前にtokenizersのバージョンを確認
 try:
@@ -30,6 +32,34 @@ try:
                 sys.exit(1)
 except ImportError:
     pass  # tokenizersがインストールされていない場合は後の依存関係エラーで対応
+
+def check_required_modules():
+    """必要なモジュールが存在するか確認"""
+    required_modules = {
+        "brain_model": ["BrainModel"],
+        "distillation": ["KnowledgeDistiller"],
+        "inference": ["InferenceEngine", "StreamingCallback"],
+        "memory_system": ["MemorySystem", "WorkingMemory"],
+        "memory_util": ["log_memory_usage"]
+    }
+    
+    missing_modules = []
+    
+    for module_name, classes in required_modules.items():
+        try:
+            module = import_module(module_name)
+            for class_name in classes:
+                if not hasattr(module, class_name):
+                    missing_modules.append(f"{module_name}.{class_name}")
+        except ImportError:
+            missing_modules.append(module_name)
+    
+    if missing_modules:
+        logger.error(f"以下の必要なモジュールまたはクラスが見つかりません: {', '.join(missing_modules)}")
+        logger.error("プロジェクトの構造が正しいか確認してください。")
+        return False
+    
+    return True
 
 from transformers import AutoTokenizer
 from brain_model import BrainModel
@@ -125,6 +155,40 @@ def print_streaming_text(text):
     sys.stdout.write(text)
     sys.stdout.flush()
 
+def force_gc():
+    """強制的にガベージコレクションを実行してメモリを解放"""
+    gc.collect()
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+    logger.info("ガベージコレクションを実行してメモリを解放しました")
+
+def check_model_tokenizer_compatibility(model_path: str, tokenizer_name: str) -> bool:
+    """モデルとトークナイザーの互換性を確認"""
+    # Hugging Faceモデルの場合
+    if not os.path.exists(model_path) and '/' in model_path:
+        logger.info(f"Hugging Faceモデル {model_path} を使用します")
+        return True
+    
+    # ローカルファイルの場合
+    if not os.path.exists(model_path):
+        logger.error(f"モデルファイルが存在しません: {model_path}")
+        return False
+    
+    try:
+        checkpoint = torch.load(model_path, map_location="cpu")
+        if "model_config" in checkpoint and "tokenizer_name" in checkpoint["model_config"]:
+            saved_tokenizer = checkpoint["model_config"]["tokenizer_name"]
+            if saved_tokenizer != tokenizer_name:
+                logger.warning(f"モデルは {saved_tokenizer} トークナイザーで訓練されましたが、{tokenizer_name} を使用しようとしています")
+                logger.warning("これにより予期しない結果が発生する可能性があります")
+                return input("続行しますか？ (y/n): ").lower() == 'y'
+    except Exception as e:
+        logger.warning(f"モデルファイルの読み込み中にエラーが発生しました: {e}")
+        logger.warning("モデルとトークナイザーの互換性を確認できません")
+        return input("続行しますか？ (y/n): ").lower() == 'y'
+    
+    return True
+
 def run_distillation(args):
     """知識蒸留を実行"""
     logger.info("Starting knowledge distillation process")
@@ -216,6 +280,7 @@ def run_distillation(args):
         "use_cpu_only": args.use_cpu_only,  # CPU専用モード
         "use_direct_gpu": args.use_direct_gpu or is_nightly,  # PyTorch nightly対応
         "use_triton_windows": args.use_triton_windows,  # triton-windows使用
+        "tokenizer_name": args.teacher_model,  # トークナイザー名を保存して互換性チェックに使用
     }
     
     # 知識蒸留器の初期化
@@ -258,16 +323,25 @@ def run_distillation(args):
     
     # 知識蒸留の実行
     logger.info("Starting distillation")
-    best_model_path = distiller.distill(
-        train_data_path=train_data_path,
-        val_data_path=val_data_path,
-        output_dir=args.output_dir,
-        batch_size=args.batch_size,
-        num_epochs=args.num_epochs,
-        gradient_accumulation_steps=args.gradient_accumulation,
-        use_ram_cache=args.use_ram_cache,
-        checkpoint_every=args.checkpoint_every
-    )
+    try:
+        best_model_path = distiller.distill(
+            train_data_path=train_data_path,
+            val_data_path=val_data_path,
+            output_dir=args.output_dir,
+            batch_size=args.batch_size,
+            num_epochs=args.num_epochs,
+            gradient_accumulation_steps=args.gradient_accumulation,
+            use_ram_cache=args.use_ram_cache,
+            checkpoint_every=args.checkpoint_every,
+            config=config  # 設定情報もチェックポイントに保存
+        )
+    except Exception as e:
+        logger.error(f"知識蒸留中にエラーが発生しました: {e}")
+        logger.info("最後のチェックポイントから再開できる可能性があります")
+        return None
+    
+    # モデル使用後のメモリ解放
+    force_gc()
     
     # Hugging Face形式でモデルを保存
     if args.save_hf_format:
@@ -291,11 +365,20 @@ def run_inference(args):
     """推論を実行"""
     logger.info("Starting inference")
     
-    engine = InferenceEngine(
-        model_path=args.model_path,
-        tokenizer_name=args.tokenizer_name,
-        stream_output=True
-    )
+    # モデルとトークナイザーの互換性チェック
+    if not check_model_tokenizer_compatibility(args.model_path, args.tokenizer_name):
+        logger.error("モデルとトークナイザーの互換性の問題により中止します")
+        return
+    
+    try:
+        engine = InferenceEngine(
+            model_path=args.model_path,
+            tokenizer_name=args.tokenizer_name,
+            stream_output=True
+        )
+    except Exception as e:
+        logger.error(f"推論エンジンの初期化に失敗しました: {e}")
+        return
     
     if args.interactive:
         print("\n=== 対話モード開始 ===")
@@ -334,11 +417,21 @@ def run_chat(args):
     """チャットモードを実行"""
     logger.info("Starting chat mode")
     
-    engine = InferenceEngine(
-        model_path=args.model_path,
-        tokenizer_name=args.tokenizer_name,
-        stream_output=True
-    )
+    # モデルとトークナイザーの互換性チェック
+    if not check_model_tokenizer_compatibility(args.model_path, args.tokenizer_name):
+        logger.error("モデルとトークナイザーの互換性の問題により中止します")
+        return
+    
+    try:
+        engine = InferenceEngine(
+            model_path=args.model_path,
+            tokenizer_name=args.tokenizer_name,
+            stream_output=True
+        )
+    except Exception as e:
+        logger.error(f"推論エンジンの初期化に失敗しました: {e}")
+        return
+    
     print("\n=== チャットモード開始 ===")
     print("終了するには 'exit' または 'quit' と入力してください。")
     
@@ -348,6 +441,12 @@ def run_chat(args):
             user_input = input("\nあなた: ")
             if user_input.lower() in ["exit", "quit"]:
                 break
+            
+            # チャット履歴が大きくなりすぎないように制限
+            if len(chat_history) > 100:
+                chat_history = chat_history[-50:]
+                logger.info("チャット履歴を整理しました")
+            
             chat_history.append({"role": "user", "content": user_input})
             context = ""
             for i, message in enumerate(chat_history[-5:]):
@@ -358,6 +457,11 @@ def run_chat(args):
             callback = StreamingCallback(print_streaming_text)
             response = engine.generate_response(context, callback)
             chat_history.append({"role": "assistant", "content": response})
+            
+            # メモリの定期的なクリーンアップ
+            if len(chat_history) % 10 == 0:
+                force_gc()
+                
             engine.maintenance()
         except KeyboardInterrupt:
             print("\n\n終了します...")
@@ -365,16 +469,32 @@ def run_chat(args):
         except Exception as e:
             logger.error(f"Error during chat: {e}")
             print(f"\nエラーが発生しました: {e}\n")
+            # エラー発生後もメモリをクリーンアップ
+            force_gc()
 
 def main():
     """メイン関数"""
+    # 必須モジュールのチェック
+    if not check_required_modules():
+        logger.error("必須モジュールが見つからないため、プログラムを終了します。")
+        sys.exit(1)
+        
     args = parse_arguments()
-    if args.mode == "distill":
-        run_distillation(args)
-    elif args.mode == "infer":
-        run_inference(args)
-    elif args.mode == "chat":
-        run_chat(args)
+    try:
+        if args.mode == "distill":
+            run_distillation(args)
+        elif args.mode == "infer":
+            run_inference(args)
+        elif args.mode == "chat":
+            run_chat(args)
+    except Exception as e:
+        logger.critical(f"予期しないエラーが発生しました: {e}")
+        import traceback
+        logger.critical(traceback.format_exc())
+        sys.exit(1)
+    finally:
+        # プログラム終了時にメモリを解放
+        force_gc()
 
 if __name__ == "__main__":
     main()
