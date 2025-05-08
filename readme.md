@@ -4,6 +4,11 @@
 
 EN: https://github.com/rintaro-s/lal_v3/blob/main/readme_en.md
 
+
+## 個人的メモ
+gguf対応、妹モード対応、学習時エラー
+
+
 ## 主な特徴
 
 1. マルチプロセス脳モデル
