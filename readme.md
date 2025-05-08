@@ -1,8 +1,9 @@
 # 人間のような思考プロセスを持つLLMシステム
 
-このプロジェクトは、人間のような思考プロセスを模倣した言語モデルシステムを実装しています。主な特徴として、リアルタイムで思考しながら回答を生成する能力や、複数の脳機能を模した並列処理システムを備えています。
+このプロジェクトは、人間のような思考プロセスを模倣した言語モデルシステムを実装しています。主な特徴として、リアルタイムで思考しながら回答を生成する能力や、複数の脳機能を模した並列処理システム、妹キャラクターによる親しみやすい応答生成機能を備えています。
 
-EN:https://github.com/rintaro-s/lal_v3/blob/main/readme_en.md
+EN: https://github.com/rintaro-s/lal_v3/blob/main/readme_en.md
+
 ## 主な特徴
 
 1. マルチプロセス脳モデル
@@ -20,6 +21,16 @@ EN:https://github.com/rintaro-s/lal_v3/blob/main/readme_en.md
    - 思考完了を待たずに出力開始
    - 不確実性の自然な表現
    - 思考ストリーミング機構
+
+4. 特定分野に特化した学習
+   - 高校の勉強内容を重点的に学習
+   - 電気電子工学の専門知識
+   - IT・プログラミング関連の知識
+
+5. 妹キャラクター対応
+   - ユーザーを「お兄ちゃん」と呼ぶ親しみやすい応答
+   - 高度な知識を優しく噛み砕いた説明
+   - 甘えた口調での自然な会話
 
 ## 使用方法
 
@@ -65,24 +76,44 @@ pip install -e .
 
 ### 知識蒸留の実行
 
-基本的な使用方法:
+#### 基本的な使用方法
+
+標準の教師モデルを使用:
 ```bash
 python main.py distill --teacher_model elyza/ELYZA-Thinking-1.0-Qwen-32B
 ```
 
+LMstudioのAPIを使用:
+```bash
+python main.py distill --use_lmstudio --lmstudio_url http://localhost:1234/v1
+```
+
+#### 特定分野に特化した学習
+
+高校の勉強と電気電子、IT分野に特化:
+```bash
+python main.py distill --teacher_model elyza/ELYZA-Thinking-1.0-Qwen-32B --focus_subjects highschool,electronics,it
+```
+
+#### 最適な設定
+
 ELYZA-Thinkingの性能をより継承するための推奨設定:
 ```bash
-python main.py distill --teacher_model elyza/ELYZA-Thinking-1.0-Qwen-32B --num_examples 5000 --num_epochs 5 --batch_size 2 --gradient_accumulation 16 --max_length 768
+python main.py distill --teacher_model elyza/ELYZA-Thinking-1.0-Qwen-32B --num_examples 5000 --num_epochs 5 --batch_size 2 --gradient_accumulation 16 --max_length 768 --imouto_mode
 ```
+
+#### リソース節約モード
 
 GPU機能がサポートされていない環境では、より軽量な代替モデルを使用できます:
 ```bash
 python main.py distill --teacher_model elyza/elyza-japanese-llama-2-7b --use_cpu_only
 ```
 
+#### モデルの保存
+
 Hugging Face形式でのモデル保存（モデルハブにアップロード可能）:
 ```bash
-python main.py distill --teacher_model elyza/ELYZA-Thinking-1.0-Qwen-32B --save_hf_format --hf_model_name "your-username/lal-brain-model"
+python main.py distill --teacher_model elyza/ELYZA-Thinking-1.0-Qwen-32B --save_hf_format --hf_model_name "your-username/lal-brain-model" --imouto_mode
 ```
 
 ### モデル選択ガイド
@@ -110,12 +141,22 @@ python main.py distill --teacher_model elyza/ELYZA-Thinking-1.0-Qwen-32B --save_
 | `--max_length` | 最大シーケンス長 | 768 |
 | `--save_hf_format` | Hugging Face形式で保存 | 有効 |
 | `--hf_model_name` | Hugging Face用のモデル名 | "lal-brain-model" |
+| `--use_lmstudio` | LMstudioからAPIで学習データを収集 | 無効 |
+| `--lmstudio_url` | LMstudioのAPIエンドポイント | "http://localhost:1234/v1" |
+| `--focus_subjects` | 重点的に学習する分野（カンマ区切り） | "highschool,electronics,it" |
+| `--imouto_mode` | 妹口調で出力するモードを有効化 | 有効 |
 
 ### 既知の問題と解決策
 
 - **tokenizersのバージョンエラー**: `tokenizers>=0.13.3 is required`というエラーが表示される場合は、tokenizersパッケージをアップグレードしてください:
   ```bash
   pip install --upgrade tokenizers>=0.13.3
+  ```
+
+- **LMstudio接続エラー**: LMstudio APIに接続できない場合は、LMstudioが正しく起動していることを確認し、URLとポートが正しいことを確認してください:
+  ```bash
+  # デフォルトのURL確認
+  python main.py distill --use_lmstudio --lmstudio_url http://localhost:1234/v1
   ```
 
 - **tritonモジュールエラー (Windows環境)**: `No module named 'triton'`というエラーが表示される場合:
@@ -147,17 +188,7 @@ python main.py distill --teacher_model elyza/ELYZA-Thinking-1.0-Qwen-32B --save_
   pip install torch==1.13.0+cu117 --extra-index-url https://download.pytorch.org/whl/cu117
   ```
 
-- **CUDA互換性エラー**: お使いのGPU/CUDAバージョンがサポートされていない場合:
-  ```bash
-  python main.py distill --use_cpu_only --teacher_model elyza/elyza-japanese-llama-2-7b
-  ```
-
-- **メモリ不足**: GPUメモリ不足エラーが発生する場合、以下のパラメータを調整してください:
-  ```bash
-  python main.py distill --batch_size 1 --gradient_accumulation 32 --quantize
-  ```
-
-- **メモリ不足エラー**: GTPモデルのロード時にメモリ不足になる場合:
+- **メモリ不足エラー**: GPUメモリ不足エラーが発生する場合、以下のパラメータを調整してください:
   ```bash
   python main.py distill --batch_size 1 --gradient_accumulation 32 --quantize
   ```
@@ -173,9 +204,16 @@ python -c "from huggingface_hub import HfApi; api = HfApi(); api.upload_folder(f
 
 ### 対話モード
 
+通常モード:
 ```bash
 python main.py chat --model_path ./models/brain_model_best.pt
 ```
+
+妹口調モード (imouto_modeで訓練されたモデル使用):
+```bash
+python main.py chat --model_path ./models/brain_model_best.pt
+```
+※妹口調で訓練されたモデルは自動的に妹キャラとして応答します
 
 Hugging Faceからロードする場合:
 ```bash
@@ -190,6 +228,7 @@ python main.py chat --model_path YOUR_USERNAME/lal-brain-model
 - `distillation.py`: 知識蒸留のプロセス
 - `inference.py`: 推論エンジン
 - `main.py`: コマンドラインインターフェイス
+- `imouto_template.py`: 妹キャラ応答の生成テンプレート
 
 ## 技術的詳細
 
@@ -222,3 +261,23 @@ ELYZAモデルからの知識蒸留を最適化するために以下の工夫を
 - CPU/GPUメモリの動的割り当てによるリソース最適化
 - より長いシーケンス長での学習による知識の完全な継承
 - 温度パラメータの最適化による多様性確保
+
+### 特定分野の学習強化
+
+システムは以下の分野に特化した学習が可能です:
+
+- **高校学習**: 数学、物理、化学、生物、地学、国語、英語など高校レベルの学習内容を重点的に学習
+- **電気電子**: 回路、半導体、電子部品、電気理論など電気電子工学の基礎から応用まで
+- **IT知識**: プログラミング言語、アルゴリズム、データ構造、ウェブ技術など
+
+これらの分野は `--focus_subjects` パラメータで指定できます。
+
+### 妹キャラクター機能
+
+`imouto_mode` を有効にすると、以下の特徴を持つ妹キャラクターとして応答します:
+
+- ユーザーを「お兄ちゃん」と呼ぶ親しみやすい口調
+- 学術的・技術的な内容を分かりやすく噛み砕いた説明
+- 質問に対して丁寧に回答する優しい性格
+- 「〜だよ」「〜だね」「〜かな？」などの柔らかい口調
+- 必要に応じて簡単な例え話を使用

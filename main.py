@@ -82,12 +82,46 @@ def parse_arguments():
     """コマンドライン引数をパース"""
     parser = argparse.ArgumentParser(description="Human-like LLM System")
     
+    # 明示的に指定されたオプションを追跡するための変数
+    explicitly_set = set()
+    original_parse_args = parser.parse_args
+    
+    # parse_argsをオーバーライドして明示的に指定されたオプションを記録
+    def custom_parse_args():
+        args = original_parse_args()
+        for action in parser._actions:
+            if action.dest != 'help' and sys.argv.count(f"--{action.dest.replace('_', '-')}"):
+                explicitly_set.add(action.dest)
+        return args
+    
+    parser.parse_args = custom_parse_args
+    
     subparsers = parser.add_subparsers(dest="mode", help="操作モード")
     
     # 蒸留モード
     distill_parser = subparsers.add_parser("distill", help="知識蒸留を実行")
     distill_parser.add_argument("--teacher_model", type=str, default="elyza/ELYZA-Thinking-1.0-Qwen-32B",
                               help="教師モデル名")
+    distill_parser.add_argument("--use_lmstudio", action="store_true", default=False,
+                              help="LMstudioからAPIで学習データを収集")
+    distill_parser.add_argument("--use_gguf", action="store_true", default=False,
+                              help="GGUFモデルを使用する")
+    distill_parser.add_argument("--gguf_model_path", type=str, default=None, 
+                              help="GGUFモデルファイルのパス")
+    distill_parser.add_argument("--gguf_context_length", type=int, default=4096,
+                              help="GGUFモデルのコンテキスト長")
+    distill_parser.add_argument("--gguf_gpu_layers", type=int, default=-1,
+                              help="GPU上で実行するレイヤー数。-1=全レイヤー、0=CPU only")
+    distill_parser.add_argument("--gguf_n_gpu", type=int, default=1,
+                              help="使用するGPUの数")
+    distill_parser.add_argument("--gguf_n_batch", type=int, default=512,
+                               help="GGUFのバッチサイズ")
+    distill_parser.add_argument("--thinking_llm", action="store_true", default=False,
+                              help="考えてから出力するタイプのLLM向けの訓練を行う")
+    distill_parser.add_argument("--lmstudio_url", type=str, default="http://localhost:1234/v1",
+                              help="LMstudioのAPIエンドポイント")
+    distill_parser.add_argument("--lmstudio_model", type=str, default=None,
+                              help="LMstudioで使用するモデル名")
     distill_parser.add_argument("--output_dir", type=str, default="./models",
                               help="モデル出力ディレクトリ")
     distill_parser.add_argument("--num_examples", type=int, default=5000,
@@ -124,6 +158,10 @@ def parse_arguments():
                               help="PyTorch nightly版でGPUに直接アクセス（最適化ライブラリなし）")
     distill_parser.add_argument("--use_triton_windows", action="store_true", default=False,
                               help="Windows環境でTritonを使用する")
+    distill_parser.add_argument("--focus_subjects", type=str, default="highschool,electronics,it",
+                              help="重点的に学習する分野（カンマ区切り）")
+    distill_parser.add_argument("--imouto_mode", action="store_true", default=True,
+                              help="妹口調で出力するモードを有効化")
     
     # 推論モード
     infer_parser = subparsers.add_parser("infer", help="推論を実行")
@@ -142,6 +180,9 @@ def parse_arguments():
                            help="トークナイザー名")
     
     args = parser.parse_args()
+    
+    # 明示的に指定されたオプションを属性として追加
+    args.explicitly_set = explicitly_set
     
     # モードが指定されていない場合はヘルプを表示
     if not args.mode:
@@ -197,16 +238,39 @@ def run_distillation(args):
     # システムリソースを表示
     log_memory_usage(logger)
     
-    # システム環境のチェック
-    if sys.platform.startswith('win'):
-        logger.info("Windows環境を検出しました")
-        # WindowsでQwen2モデルの場合、自動的にwindows_modeをオン
-        if 'qwen' in args.teacher_model.lower() and not args.use_cpu_only:
-            if not args.windows_mode:
-                logger.warning("WindowsでQwen2モデルを使用する場合はwindows_modeを推奨します")
-                if input("windows_modeを有効にしますか？ (y/n): ").lower() == 'y':
-                    args.windows_mode = True
-                    logger.info("windows_modeを有効にしました")
+    # LMstudioとGGUFモデルの優先順位付け
+    using_lmstudio = False
+    using_gguf = False
+    
+    if args.use_gguf:
+        using_gguf = True
+        logger.info("GGUFモデルを使用して蒸留データを生成します")
+        if not args.gguf_model_path:
+            logger.error("GGUF モデルパスが指定されていません。--gguf_model_path を指定してください")
+            sys.exit(1)
+        if not os.path.exists(args.gguf_model_path):
+            logger.error(f"指定されたGGUFモデルファイルが存在しません: {args.gguf_model_path}")
+            sys.exit(1)
+        if args.teacher_model and 'teacher_model' in args.explicitly_set:
+            logger.warning("GGUFモードが有効なため、指定されたteacher_modelは無視されます")
+        if args.use_lmstudio:
+            logger.warning("GGUFモードとLMstudioモードは同時に使用できません。GGUFモードを優先します")
+            args.use_lmstudio = False
+    elif args.use_lmstudio:
+        using_lmstudio = True
+        logger.info("LMstudioのAPIを使用して蒸留データを生成します")
+        if args.teacher_model and 'teacher_model' in args.explicitly_set:
+            logger.warning("LMstudioモードが有効なため、指定されたteacher_modelは無視されます")
+    elif not args.teacher_model:
+        logger.error("教師モデルが指定されていません。--teacher_model、--use_lmstudio、または --use_gguf を指定してください")
+        sys.exit(1)
+    
+    # DeepSeek-R1などの「考えてから出力するタイプのLLM」の設定
+    if args.thinking_llm or (args.teacher_model and "deepseek" in args.teacher_model.lower()):
+        logger.info("考えてから出力するタイプのLLM向けの訓練を有効化しました")
+        thinking_llm = True
+    else:
+        thinking_llm = False
     
     # PyTorch nightlyを検出
     is_nightly = False
@@ -215,7 +279,7 @@ def run_distillation(args):
         if 'dev' in torch_version or 'nightly' in torch_version:
             is_nightly = True
             logger.info(f"PyTorch nightly版を検出: {torch_version}")
-            if not args.use_direct_gpu:
+            if not args.use_direct_gpu and 'use_direct_gpu' not in args.explicitly_set:
                 logger.warning("PyTorch nightly版ではGPU最適化ライブラリが使用できない場合があります")
                 logger.info("--use_direct_gpu オプションを使用することを推奨します")
                 if input("use_direct_gpuモードを有効にしますか？ (y/n): ").lower() == 'y':
@@ -224,34 +288,104 @@ def run_distillation(args):
         pass
     
     # デバイスの設定
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = torch.device("cuda" if torch.cuda.is_available() and not args.use_cpu_only else "cpu")
     logger.info(f"Using device: {device}")
     
     # GPU情報を表示
-    if torch.cuda.is_available():
+    if torch.cuda.is_available() and not args.use_cpu_only:
         logger.info(f"GPU: {torch.cuda.get_device_name(0)}")
         logger.info(f"CUDA Version: {torch.version.cuda}")
         logger.info(f"GPU Memory: {torch.cuda.get_device_properties(0).total_memory / 1024**3:.1f} GB")
+        
+        if using_gguf:
+            # GGUFモードでGPU使用時は追加情報をログ
+            gpu_layers = args.gguf_gpu_layers if hasattr(args, 'gguf_gpu_layers') else -1
+            gpu_count = args.gguf_n_gpu if hasattr(args, 'gguf_n_gpu') else 1
+            batch_size = args.gguf_n_batch if hasattr(args, 'gguf_n_batch') else 512
+            logger.info(f"GGUF GPU設定: GPU層数={gpu_layers}, GPU数={gpu_count}, バッチサイズ={batch_size}")
     
     # トークナイザーの読み込み
-    logger.info(f"Loading tokenizer for {args.teacher_model}")
-    try:
-        tokenizer = AutoTokenizer.from_pretrained(args.teacher_model)
-    except Exception as e:
-        logger.error(f"Failed to load tokenizer: {e}")
-        logger.info("Trying slow tokenizer instead...")
+    tokenizer = None
+    if using_gguf:
+        # GGUFモデル使用時はベースモデルのトークナイザーを使用
         try:
-            # fast=FalseオプションでLLaMAのslow tokenizerを使用
-            tokenizer = AutoTokenizer.from_pretrained(args.teacher_model, use_fast=False)
-            logger.info("Successfully loaded slow tokenizer")
-        except Exception as inner_e:
-            logger.error(f"Also failed to load slow tokenizer: {inner_e}")
-            logger.error("Please upgrade tokenizers package: pip install --upgrade tokenizers>=0.13.3")
+            # DeepSeek-R1などはQwen系のトークナイザーを使用
+            if "deepseek" in args.gguf_model_path.lower() and "qwen" in args.gguf_model_path.lower():
+                logger.info("DeepSeek-Qwen系のトークナイザーを使用します")
+                tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen-14B", trust_remote_code=True)
+            else:
+                # デフォルトはLLaMAトークナイザーを使用
+                logger.info("デフォルトのLLaMAトークナイザーを使用します")
+                tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-2-7b-hf")
+            
+            # 必要に応じてPADトークンを設定
+            if tokenizer.pad_token is None:
+                tokenizer.pad_token = tokenizer.eos_token
+        except Exception as e:
+            logger.error(f"Failed to load tokenizer for GGUF model: {e}")
+            if "custom code" in str(e) and "trust_remote_code=True" in str(e):
+                logger.error("カスタムコードを含むモデルを使用しています。再試行します。")
+                try:
+                    if "deepseek" in args.gguf_model_path.lower() and "qwen" in args.gguf_model_path.lower():
+                        tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen-14B", trust_remote_code=True)
+                    elif "qwen" in args.gguf_model_path.lower():
+                        tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen-7B", trust_remote_code=True)
+                    elif "chatglm" in args.gguf_model_path.lower():
+                        tokenizer = AutoTokenizer.from_pretrained("THUDM/chatglm-6b", trust_remote_code=True)
+                    else:
+                        tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-2-7b-hf")
+                    logger.info("trust_remote_code=Trueオプションでトークナイザーの読み込みに成功しました")
+                except Exception as e2:
+                    logger.error(f"トークナイザー読み込みの2回目の試行も失敗しました: {e2}")
+                    sys.exit(1)
+            else:
+                sys.exit(1)
+    elif not using_lmstudio:
+        logger.info(f"Loading tokenizer for {args.teacher_model}")
+        try:
+            needs_trust_remote = any(x in args.teacher_model.lower() for x in ["qwen", "chatglm", "deepseek", "baichuan", "internlm"])
+            
+            if needs_trust_remote:
+                logger.info(f"カスタムコードを含むモデルと判断し、trust_remote_code=Trueを使用します: {args.teacher_model}")
+                tokenizer = AutoTokenizer.from_pretrained(args.teacher_model, trust_remote_code=True)
+            else:
+                tokenizer = AutoTokenizer.from_pretrained(args.teacher_model)
+        except Exception as e:
+            logger.error(f"Failed to load tokenizer: {e}")
+            if "custom code" in str(e) and "trust_remote_code=True" in str(e):
+                logger.info("カスタムコードを含むモデルと判明しました。trust_remote_code=Trueで再試行します。")
+                try:
+                    tokenizer = AutoTokenizer.from_pretrained(args.teacher_model, trust_remote_code=True)
+                    logger.info("trust_remote_code=Trueオプションでトークナイザーの読み込みに成功しました")
+                except Exception as inner_e:
+                    logger.error(f"trust_remote_code=Trueでも失敗しました: {inner_e}")
+                    logger.info("Trying slow tokenizer instead...")
+                    try:
+                        tokenizer = AutoTokenizer.from_pretrained(args.teacher_model, use_fast=False, trust_remote_code=True)
+                        logger.info("Successfully loaded slow tokenizer with trust_remote_code=True")
+                    except Exception as slow_e:
+                        logger.error(f"Also failed to load slow tokenizer: {slow_e}")
+                        logger.error("Please upgrade tokenizers package: pip install --upgrade tokenizers>=0.13.3")
+                        sys.exit(1)
+            else:
+                logger.info("Trying slow tokenizer instead...")
+                try:
+                    tokenizer = AutoTokenizer.from_pretrained(args.teacher_model, use_fast=False)
+                    logger.info("Successfully loaded slow tokenizer")
+                except Exception as inner_e:
+                    logger.error(f"Also failed to load slow tokenizer: {inner_e}")
+                    logger.error("Please upgrade tokenizers package: pip install --upgrade tokenizers>=0.13.3")
+                    sys.exit(1)
+        
+        if tokenizer.pad_token is None:
+            tokenizer.pad_token = tokenizer.eos_token
+    else:
+        try:
+            tokenizer = AutoTokenizer.from_pretrained("gpt2")
+            logger.info("LMstudio用にデフォルトのGPT-2トークナイザーを使用します")
+        except Exception as e:
+            logger.error(f"Failed to load default tokenizer for LMstudio: {e}")
             sys.exit(1)
-    
-    # 必要に応じてPADトークンを設定
-    if tokenizer.pad_token is None:
-        tokenizer.pad_token = tokenizer.eos_token
     
     # 生徒モデルの初期化
     logger.info("Initializing student model")
@@ -280,29 +414,49 @@ def run_distillation(args):
         "use_cpu_only": args.use_cpu_only,  # CPU専用モード
         "use_direct_gpu": args.use_direct_gpu or is_nightly,  # PyTorch nightly対応
         "use_triton_windows": args.use_triton_windows,  # triton-windows使用
-        "tokenizer_name": args.teacher_model,  # トークナイザー名を保存して互換性チェックに使用
+        "tokenizer_name": args.teacher_model if not (using_lmstudio or using_gguf) else "gpt2",  # トークナイザー名
+        "focus_subjects": args.focus_subjects.split(','),
+        "imouto_mode": args.imouto_mode,
+        "use_lmstudio": using_lmstudio,
+        "lmstudio_url": args.lmstudio_url,
+        "lmstudio_model": args.lmstudio_model,
+        "use_gguf": using_gguf,
+        "gguf_model_path": args.gguf_model_path if using_gguf else None,
+        "gguf_context_length": args.gguf_context_length if using_gguf else None,
+        "thinking_llm": thinking_llm,
+        # GGUF用GPUオプションを強化
+        "gguf_use_gpu": not args.use_cpu_only and torch.cuda.is_available(),
+        "gguf_n_gpu_layers": args.gguf_gpu_layers if hasattr(args, 'gguf_gpu_layers') else -1,
+        "gguf_n_gpu": args.gguf_n_gpu if hasattr(args, 'gguf_n_gpu') else 1,
+        "gguf_n_batch": args.gguf_n_batch if hasattr(args, 'gguf_n_batch') else 512,
     }
     
     # 知識蒸留器の初期化
     try:
         distiller = KnowledgeDistiller(
-            teacher_model_name=args.teacher_model,
+            teacher_model_name=None if using_lmstudio or using_gguf else args.teacher_model,
             student_model=student_model,
             tokenizer=tokenizer,
             device=device,
             config=config,
-            quantize=args.quantize,
-            cpu_offload=args.cpu_offload
+            quantize=args.quantize and not (using_lmstudio or using_gguf),  # 外部モデル利用時は量子化不要
+            cpu_offload=args.cpu_offload and not (using_lmstudio or using_gguf)  # 外部モデル利用時はオフロード不要
         )
     except Exception as e:
-        logger.error(f"Error initializing distiller with {args.teacher_model}: {e}")
+        if using_gguf:
+            model_name = args.gguf_model_path
+        elif using_lmstudio:
+            model_name = args.lmstudio_url
+        else:
+            model_name = args.teacher_model
+        logger.error(f"Error initializing distiller with {model_name}: {e}")
         sys.exit(1)
     
     # 出力ディレクトリの作成
     os.makedirs(args.output_dir, exist_ok=True)
     
     # 蒸留データの生成
-    logger.info(f"Generating {args.num_examples} distillation examples")
+    logger.info(f"Generating {args.num_examples} distillation examples focusing on: {args.focus_subjects}")
     train_data_path = os.path.join(args.output_dir, "train_data.json")
     val_data_path = os.path.join(args.output_dir, "val_data.json")
     if not (os.path.exists(train_data_path) and os.path.exists(val_data_path)):
@@ -310,13 +464,19 @@ def run_distillation(args):
             questions_file="questions.txt",
             output_file=train_data_path,
             num_samples=int(args.num_examples * 0.8),
-            cache_to_ram=args.use_ram_cache
+            cache_to_ram=args.use_ram_cache,
+            focus_subjects=args.focus_subjects.split(','),
+            imouto_mode=args.imouto_mode,
+            thinking_llm=thinking_llm  # 考えてから出力するタイプのLLM用のデータ生成
         )
         distiller.prepare_distillation_data(
             questions_file="questions.txt",
             output_file=val_data_path,
             num_samples=int(args.num_examples * 0.2),
-            cache_to_ram=args.use_ram_cache
+            cache_to_ram=args.use_ram_cache,
+            focus_subjects=args.focus_subjects.split(','),
+            imouto_mode=args.imouto_mode,
+            thinking_llm=thinking_llm  # 考えてから出力するタイプのLLM用のデータ生成
         )
     else:
         logger.info(f"Using existing data files: {train_data_path}, {val_data_path}")

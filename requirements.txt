@@ -1,7 +1,7 @@
 # 以下のいずれかの方法でPyTorchをインストール:
 
 # 1. 通常のPyTorch (安定版)
-torch>=1.12.0
+torch>=2.0.0
 torchvision>=0.13.0
 torchaudio>=0.12.0
 
@@ -19,13 +19,13 @@ torchaudio>=0.12.0
 # torchaudio==2.0.1+cu118
 
 # 基本依存関係
-transformers>=4.32.0
+transformers>=4.33.0
 tokenizers>=0.13.3
-numpy>=1.21.0
-tqdm>=4.64.0
+numpy>=1.24.0
+tqdm>=4.65.0
 psutil>=5.9.0
 sentencepiece>=0.1.97
-accelerate>=0.20.0
+accelerate>=0.21.0
 bitsandbytes>=0.40.0
 safetensors>=0.3.0
 einops>=0.6.0
@@ -33,6 +33,7 @@ scipy>=1.7.0
 scikit-learn>=1.0.0
 matplotlib>=3.5.0
 huggingface-hub>=0.16.0
+llama-cpp-python>=0.2.11  # GGUFモデル対応
 
 # GPUアクセラレーション (環境に合わせて選択)
 # triton>=2.0.0 # Linuxのみ

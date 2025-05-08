@@ -5,6 +5,7 @@ import queue
 import os
 import logging
 import gc
+import json
 from typing import List, Dict, Optional, Callable
 from transformers import AutoTokenizer
 
@@ -42,6 +43,7 @@ class InferenceEngine:
     ):
         self.logger = logging.getLogger(__name__)
         self.stream_output = stream_output
+        self.imouto_mode = False  # デフォルトはオフ
         
         # デバイスの設定
         if device:
@@ -71,6 +73,11 @@ class InferenceEngine:
                     memory_size=1000  # デフォルト値
                 )
                 self.model.load_state_dict(torch.load(os.path.join(model_path, "pytorch_model.bin")))
+                # 設定ファイルの確認
+                if os.path.exists(os.path.join(model_path, "config.json")):
+                    with open(os.path.join(model_path, "config.json"), "r") as f:
+                        config = json.load(f)
+                        self.imouto_mode = config.get("imouto_mode", False)
             else:
                 # 通常のPyTorch形式モデル
                 checkpoint = torch.load(model_path, map_location=self.device)
@@ -85,7 +92,9 @@ class InferenceEngine:
                 
                 # モデルの状態を読み込む
                 self.model.load_state_dict(checkpoint['model_state_dict'])
+                self.imouto_mode = checkpoint.get('imouto_mode', False)
                 self.logger.info(f"Model loaded from checkpoint at epoch {checkpoint.get('epoch', 'unknown')}")
+                self.logger.info(f"Imouto mode: {'enabled' if self.imouto_mode else 'disabled'}")
         except Exception as e:
             self.logger.error(f"Error loading model: {e}")
             raise RuntimeError(f"Failed to load model from {model_path}: {e}")
@@ -147,6 +156,15 @@ class InferenceEngine:
         """入力テキストに対する応答を生成"""
         if callback is None:
             callback = StreamingCallback()
+        
+        # 妹口調モードが有効なら、プロンプトを適宜修正
+        if self.imouto_mode and "お兄ちゃん" not in input_text:
+            # ユーザー入力の場合のみ修正（チャット履歴には適用しない）
+            if input_text.startswith("質問:") or not ("あなた:" in input_text or "AI:" in input_text):
+                input_text = f"質問: {input_text}\n回答（妹口調で、お兄ちゃんと呼んで）: "
+            # チャット履歴の場合は末尾だけを修正
+            elif input_text.endswith("AI: "):
+                input_text = input_text.rstrip("AI: ") + "妹AI: "
         
         # すでに生成中の場合は終了
         if self.is_generating:
