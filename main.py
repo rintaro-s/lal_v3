@@ -79,6 +79,40 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+def check_model_parameters(model):
+    """モデルパラメータの整合性をチェックする関数"""
+    try:
+        # 次元の整合性を確認
+        issues = []
+        
+        # 各モジュールの次元を確認
+        if hasattr(model, 'left_brain') and hasattr(model, 'right_brain'):
+            left_dim = model.left_brain.hidden_dim if hasattr(model.left_brain, 'hidden_dim') else -1
+            right_dim = model.right_brain.hidden_dim if hasattr(model.right_brain, 'hidden_dim') else -1
+            
+            if left_dim != right_dim and left_dim > 0 and right_dim > 0:
+                issues.append(f"左脳と右脳の次元が一致しません: {left_dim} vs {right_dim}")
+        
+        # 埋め込み層と出力層の次元を確認
+        if hasattr(model, 'embedding') and hasattr(model, 'output'):
+            embed_dim = model.embedding.embedding_dim if hasattr(model.embedding, 'embedding_dim') else -1
+            output_dim = model.output.in_features if hasattr(model.output, 'in_features') else -1
+            
+            if embed_dim != output_dim and embed_dim > 0 and output_dim > 0:
+                issues.append(f"埋め込み次元と出力次元が一致しません: {embed_dim} vs {output_dim}")
+        
+        # 問題があれば報告
+        if issues:
+            logger.warning("モデルパラメータに問題が見つかりました:")
+            for issue in issues:
+                logger.warning(f" - {issue}")
+            return False
+        
+        return True
+    except Exception as e:
+        logger.error(f"モデルパラメータ確認中にエラーが発生: {e}")
+        return False
+
 def parse_arguments():
     """コマンドライン引数をパース"""
     parser = argparse.ArgumentParser(description="Human-like LLM System")
@@ -171,6 +205,11 @@ def parse_arguments():
                               help="重点的に学習する分野（カンマ区切り）")
     distill_parser.add_argument("--imouto_mode", action="store_true", default=True,
                               help="妹口調で出力するモードを有効化")
+    distill_parser.add_argument("--skip_teacher_model", action="store_true",
+                              help="教師モデルをロードせず、直接学習する")
+    distill_parser.add_argument("--hidden_size", type=int, default=768, help="隠れ層のサイズ")
+    distill_parser.add_argument("--embedding_dim", type=int, default=None, help="埋め込み次元（指定された場合はhidden_sizeより優先）")
+    distill_parser.add_argument("--model_dim", type=int, default=768, help="モデル次元（hidden_sizeと同じ値を推奨）")
     
     # 推論モード
     infer_parser = subparsers.add_parser("infer", help="推論を実行")
@@ -245,7 +284,7 @@ def check_model_tokenizer_compatibility(model_path: str, tokenizer_name: str) ->
     return True
 
 def load_tokenizer_and_models(args):
-    """トークナイザーと教師モデル、学生モデルをロードする"""
+    """トークナイザーとモデルを読み込む"""
     # デバイスの設定
     if args.use_cpu_only:
         device = torch.device("cpu")
@@ -283,26 +322,49 @@ def load_tokenizer_and_models(args):
     vocab_size = len(tokenizer)
     logger.info(f"語彙サイズ: {vocab_size}")
     
-    # 学生モデル（生成される脳モデル）の初期化
-    logger.info("Initializing student model")
+    # モデルのパラメータ設定（デフォルト値を用意）
+    hidden_size = getattr(args, 'hidden_size', 768)
+    embedding_dim = getattr(args, 'embedding_dim', None)
+    num_layers = getattr(args, 'num_layers', 12)
+    num_heads = getattr(args, 'num_heads', 12)
+    dropout = getattr(args, 'dropout', 0.1)
+    
+    logger.info(f"モデル設定: hidden_size={hidden_size}, num_layers={num_layers}, num_heads={num_heads}")
+
+    # 学生モデル初期化と次元調整
     try:
-        # BrainModelは vocab_size, embedding_dim, hidden_dim, memory_size を受け付ける
+        logger.info("Initializing student model")
         student_model = BrainModel(
-            vocab_size=vocab_size,  # トークナイザーの語彙サイズ
-            embedding_dim=args.max_length,  # max_lengthを埋め込みサイズとして使用
-            hidden_dim=1024,  # デフォルト値
-            memory_size=1000  # デフォルト値
+            vocab_size=vocab_size,
+            hidden_size=hidden_size,
+            embedding_dim=embedding_dim,
+            num_layers=num_layers,
+            num_heads=num_heads,
+            output_size=vocab_size,  # 出力サイズは語彙サイズに合わせる
+            dropout=dropout
         )
     except Exception as e:
-        logger.error(f"学生モデルの初期化に失敗: {e}")
+        logger.error(f"学生モデルの初期化に失敗しました: {e}")
         import traceback
         logger.error(traceback.format_exc())
-        logger.critical("学生モデルが初期化できませんでした。終了します。")
-        sys.exit(1)
+        
+        # フォールバック: シンプルな設定での再試行
+        try:
+            logger.info("シンプルな設定でモデル初期化を再試行します")
+            student_model = BrainModel(
+                vocab_size=vocab_size,
+                hidden_size=768,  # 固定値を使用
+                num_layers=12,
+                num_heads=12,
+                dropout=0.1
+            )
+        except Exception as fallback_error:
+            logger.error(f"フォールバック初期化も失敗しました: {fallback_error}")
+            exit(1)
     
     # 教師モデル（ベースとなる大規模モデル）の設定構成
     teacher_model = None
-    if not args.use_lmstudio and not args.use_gguf:
+    if not args.use_lmstudio and not args.use_gguf and not args.skip_teacher_model:
         # 量子化の設定
         if args.quantize:
             logger.info("Initializing 8-bit quantization")
@@ -337,7 +399,7 @@ def load_tokenizer_and_models(args):
     # KnowledgeDistillerインスタンスの初期化
     try:
         distiller = KnowledgeDistiller(
-            teacher_model_name=args.teacher_model,
+            teacher_model_name=args.teacher_model if not args.skip_teacher_model else None,
             student_model=student_model,
             tokenizer=tokenizer,
             device=device,
@@ -364,7 +426,8 @@ def load_tokenizer_and_models(args):
             },
             quantize=args.quantize,
             cpu_offload=args.cpu_offload,
-            use_cpu_only=args.use_cpu_only
+            use_cpu_only=args.use_cpu_only,
+            skip_teacher_model=args.skip_teacher_model
         )
         # 教師モデルをセット (LMStudioやGGUF以外の場合)
         if teacher_model is not None:
@@ -379,9 +442,41 @@ def load_tokenizer_and_models(args):
 
 def run_distillation(args):
     """知識蒸留を実行する"""
+    from memory_utils import validate_model_config
+    
+    # モデル設定の検証と補正
+    args = validate_model_config(args)
+    
     # ステップ1: トークナイザー、モデル、蒸留器をロード
     tokenizer, student_model, distiller = load_tokenizer_and_models(args)
     
+    # モデル次元の整合性チェック
+    def check_model_dimensions(vocab_size):
+        """モデル次元の整合性をチェック"""
+        # 出力サイズが語彙サイズと一致しているか確認
+        if args.hidden_size != args.model_dim:
+            logger.warning(f"モデル次元の不一致: hidden_size={args.hidden_size}, model_dim={args.model_dim}")
+            # 自動修正
+            args.model_dim = args.hidden_size
+            logger.info(f"model_dimをhidden_sizeに合わせて自動調整: {args.model_dim}")
+        
+        logger.info(f"モデル次元情報: vocab_size={vocab_size}, hidden_size={args.hidden_size}, model_dim={args.model_dim}")
+        return args.hidden_size, args.model_dim  # 調整済みの値を返す
+    
+    # 次元を確認・調整
+    hidden_size, model_dim = check_model_dimensions(len(tokenizer))
+    
+    # デバイスの設定を取得して学生モデルを明示的に移動
+    device = torch.device("cuda" if torch.cuda.is_available() and not args.use_cpu_only else "cpu")
+    student_model = student_model.to(device)
+    logger.info(f"学生モデルを {device} デバイスに明示的に移動しました")
+    
+    # モデルが正しく初期化されているか確認
+    logger.info("モデルパラメータの整合性をチェックしています...")
+    if not check_model_parameters(student_model):
+        logger.warning("モデルパラメータに問題が見つかりました。次元修正機能を有効化します。")
+        distiller.config["use_dimension_fix"] = True
+
     # ステップ2: 蒸留パスの設定
     train_data_path = os.path.join("models", "train_data.json")
     val_data_path = os.path.join("models", "val_data.json")

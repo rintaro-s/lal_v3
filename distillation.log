@@ -2874,3 +2874,493 @@ AttributeError: 'BrainModel' object has no attribute 'save_pretrained'
 2025-05-08 20:41:43,917 - __main__ - ERROR - Failed to save model in Hugging Face format
 2025-05-08 20:41:44,086 - __main__ - INFO - ガベージコレクションを実行してメモリを解放しました
 2025-05-08 20:41:44,339 - __main__ - INFO - ガベージコレクションを実行してメモリを解放しました
+2025-05-08 21:04:20,363 - __main__ - INFO - RAM: 使用中 27.5GB / 95.4GB (28.9%)
+2025-05-08 21:04:20,397 - __main__ - INFO - GPU 0 (NVIDIA GeForce RTX 5070 Ti): 確保 0.0GB / 予約 0.0GB / 合計 15.9GB
+2025-05-08 21:04:20,397 - __main__ - INFO - PyTorch nightly版を検出: 2.7.0.dev20250309+cu128
+2025-05-08 21:04:20,397 - __main__ - WARNING - PyTorch nightly版ではGPU最適化ライブラリが使用できない場合があります
+2025-05-08 21:04:20,397 - __main__ - INFO - --use_direct_gpu オプションを使用することを推奨します
+2025-05-08 21:04:33,696 - __main__ - INFO - 重点分野: highschool, electronics, it
+2025-05-08 21:04:33,697 - __main__ - INFO - Using device: cuda
+2025-05-08 21:04:33,697 - __main__ - INFO - GPU: NVIDIA GeForce RTX 5070 Ti
+2025-05-08 21:04:33,697 - __main__ - INFO - CUDA Version: 12.8
+2025-05-08 21:04:33,698 - __main__ - INFO - GPU Memory: 15.9 GB
+2025-05-08 21:04:33,698 - __main__ - INFO - Loading tokenizer for elyza/Llama-3-ELYZA-JP-8B
+2025-05-08 21:04:34,308 - __main__ - INFO - パッドトークンがないため、EOSトークンをパッドトークンとして設定しました
+2025-05-08 21:04:34,325 - __main__ - INFO - 語彙サイズ: 128256
+2025-05-08 21:04:34,325 - __main__ - INFO - Initializing student model
+2025-05-08 21:04:35,991 - __main__ - INFO - Initializing 8-bit quantization
+2025-05-08 21:04:35,991 - __main__ - INFO - Loading teacher model: elyza/Llama-3-ELYZA-JP-8B
+2025-05-08 21:04:41,888 - accelerate.utils.modeling - INFO - We will use 90% of the memory on device 0 for storing the model, and 10% for the buffer to avoid OOM. You can set `max_memory` in to a higher value to use more memory (at your own risk).
+2025-05-08 21:04:51,829 - __main__ - INFO - 教師モデルのロードが完了しました
+2025-05-08 21:04:51,829 - distillation - INFO - トークナイザーのパディング方向を左側に設定します
+2025-05-08 21:04:51,835 - distillation - INFO - RAM使用状況: 31.6% (使用中: 30.1GB, 空き: 65.3GB)
+2025-05-08 21:04:51,982 - __main__ - INFO - 学生モデルを cuda デバイスに明示的に移動しました
+2025-05-08 21:04:51,983 - __main__ - INFO - Generating 5000 distillation examples focusing on: highschool, electronics, it
+2025-05-08 21:04:51,983 - __main__ - INFO - Starting distillation
+2025-05-08 21:04:51,983 - distillation - INFO - Starting distillation process
+2025-05-08 21:04:51,983 - distillation - INFO - Loading data from models\train_data.json
+2025-05-08 21:04:51,986 - distillation - INFO - Loaded 436 examples for distillation
+2025-05-08 21:04:51,986 - distillation - INFO - Loading data from models\val_data.json
+2025-05-08 21:04:51,988 - distillation - INFO - Loaded 43 examples for distillation
+2025-05-08 21:04:51,988 - distillation - INFO - Loaded training dataset with 436 examples
+2025-05-08 21:04:51,988 - distillation - INFO - Loaded validation dataset with 43 examples
+2025-05-08 21:04:51,989 - distillation - INFO - Starting training loop
+2025-05-08 21:04:52,505 - distillation - ERROR - Distillation process failed: mat1 and mat2 shapes cannot be multiplied (2048x2048 and 1024x1024)
+2025-05-08 21:04:52,512 - distillation - ERROR - Traceback (most recent call last):
+  File "C:\Users\s-rin\Documents\GitHub\lal_v3\brain_model.py", line 171, in forward
+    left_output = self.left_brain(embedded, memory_context)
+  File "C:\Users\s-rin\AppData\Local\Programs\Python\Python310\lib\site-packages\torch\nn\modules\module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "C:\Users\s-rin\AppData\Local\Programs\Python\Python310\lib\site-packages\torch\nn\modules\module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "C:\Users\s-rin\Documents\GitHub\lal_v3\brain_model.py", line 42, in forward
+    x = self.reasoning(x)
+  File "C:\Users\s-rin\AppData\Local\Programs\Python\Python310\lib\site-packages\torch\nn\modules\module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "C:\Users\s-rin\AppData\Local\Programs\Python\Python310\lib\site-packages\torch\nn\modules\module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "C:\Users\s-rin\Documents\GitHub\lal_v3\brain_model.py", line 27, in forward
+    return self.layers(x)
+  File "C:\Users\s-rin\AppData\Local\Programs\Python\Python310\lib\site-packages\torch\nn\modules\module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "C:\Users\s-rin\AppData\Local\Programs\Python\Python310\lib\site-packages\torch\nn\modules\module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "C:\Users\s-rin\AppData\Local\Programs\Python\Python310\lib\site-packages\torch\nn\modules\container.py", line 240, in forward
+    input = module(input)
+  File "C:\Users\s-rin\AppData\Local\Programs\Python\Python310\lib\site-packages\torch\nn\modules\module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "C:\Users\s-rin\AppData\Local\Programs\Python\Python310\lib\site-packages\torch\nn\modules\module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "C:\Users\s-rin\AppData\Local\Programs\Python\Python310\lib\site-packages\torch\nn\modules\linear.py", line 125, in forward
+    return F.linear(input, self.weight, self.bias)
+RuntimeError: mat1 and mat2 shapes cannot be multiplied (2048x2048 and 1024x1024)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\s-rin\Documents\GitHub\lal_v3\distillation.py", line 336, in distill
+    outputs = self.student_model(
+  File "C:\Users\s-rin\AppData\Local\Programs\Python\Python310\lib\site-packages\torch\nn\modules\module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "C:\Users\s-rin\AppData\Local\Programs\Python\Python310\lib\site-packages\torch\nn\modules\module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "C:\Users\s-rin\Documents\GitHub\lal_v3\brain_model.py", line 194, in forward
+    left_output = self.left_brain(embedded, memory_context)
+  File "C:\Users\s-rin\AppData\Local\Programs\Python\Python310\lib\site-packages\torch\nn\modules\module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "C:\Users\s-rin\AppData\Local\Programs\Python\Python310\lib\site-packages\torch\nn\modules\module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "C:\Users\s-rin\Documents\GitHub\lal_v3\brain_model.py", line 42, in forward
+    x = self.reasoning(x)
+  File "C:\Users\s-rin\AppData\Local\Programs\Python\Python310\lib\site-packages\torch\nn\modules\module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "C:\Users\s-rin\AppData\Local\Programs\Python\Python310\lib\site-packages\torch\nn\modules\module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "C:\Users\s-rin\Documents\GitHub\lal_v3\brain_model.py", line 27, in forward
+    return self.layers(x)
+  File "C:\Users\s-rin\AppData\Local\Programs\Python\Python310\lib\site-packages\torch\nn\modules\module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "C:\Users\s-rin\AppData\Local\Programs\Python\Python310\lib\site-packages\torch\nn\modules\module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "C:\Users\s-rin\AppData\Local\Programs\Python\Python310\lib\site-packages\torch\nn\modules\container.py", line 240, in forward
+    input = module(input)
+  File "C:\Users\s-rin\AppData\Local\Programs\Python\Python310\lib\site-packages\torch\nn\modules\module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "C:\Users\s-rin\AppData\Local\Programs\Python\Python310\lib\site-packages\torch\nn\modules\module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "C:\Users\s-rin\AppData\Local\Programs\Python\Python310\lib\site-packages\torch\nn\modules\linear.py", line 125, in forward
+    return F.linear(input, self.weight, self.bias)
+RuntimeError: mat1 and mat2 shapes cannot be multiplied (2048x2048 and 1024x1024)
+
+2025-05-08 21:04:52,514 - __main__ - ERROR - 知識蒸留に失敗しました。モデル保存をスキップします。
+2025-05-08 21:04:52,514 - __main__ - INFO - Saving model in Hugging Face format as lorinta/lal_v3
+2025-05-08 21:04:52,514 - distillation - ERROR - モデルファイルが存在しません: None
+2025-05-08 21:04:52,514 - distillation - INFO - 代わりに現在の学生モデルを保存します
+2025-05-08 21:04:55,884 - distillation - INFO - Model and tokenizer saved in Hugging Face format to models\hf_lal_v3
+2025-05-08 21:04:55,884 - __main__ - INFO - Model successfully saved in Hugging Face format to models\hf_lal_v3
+2025-05-08 21:04:56,062 - __main__ - INFO - ガベージコレクションを実行してメモリを解放しました
+2025-05-08 21:04:56,264 - __main__ - INFO - ガベージコレクションを実行してメモリを解放しました
+2025-05-08 21:16:06,068 - __main__ - INFO - RAM: 使用中 28.3GB / 95.4GB (29.6%)
+2025-05-08 21:16:06,097 - __main__ - INFO - GPU 0 (NVIDIA GeForce RTX 5070 Ti): 確保 0.0GB / 予約 0.0GB / 合計 15.9GB
+2025-05-08 21:16:06,097 - __main__ - INFO - PyTorch nightly版を検出: 2.7.0.dev20250309+cu128
+2025-05-08 21:16:06,098 - __main__ - WARNING - PyTorch nightly版ではGPU最適化ライブラリが使用できない場合があります
+2025-05-08 21:16:06,098 - __main__ - INFO - --use_direct_gpu オプションを使用することを推奨します
+2025-05-08 21:19:03,579 - __main__ - INFO - 重点分野: highschool, electronics, it
+2025-05-08 21:19:03,580 - __main__ - INFO - Using device: cuda
+2025-05-08 21:19:03,580 - __main__ - INFO - GPU: NVIDIA GeForce RTX 5070 Ti
+2025-05-08 21:19:03,580 - __main__ - INFO - CUDA Version: 12.8
+2025-05-08 21:19:03,580 - __main__ - INFO - GPU Memory: 15.9 GB
+2025-05-08 21:19:03,580 - __main__ - INFO - Loading tokenizer for elyza/Llama-3-ELYZA-JP-8B
+2025-05-08 21:19:04,456 - __main__ - INFO - パッドトークンがないため、EOSトークンをパッドトークンとして設定しました
+2025-05-08 21:19:04,469 - __main__ - INFO - 語彙サイズ: 128256
+2025-05-08 21:19:04,470 - __main__ - INFO - Initializing student model
+2025-05-08 21:19:05,538 - __main__ - INFO - Initializing 8-bit quantization
+2025-05-08 21:19:05,538 - __main__ - INFO - Loading teacher model: elyza/Llama-3-ELYZA-JP-8B
+2025-05-08 21:19:11,088 - accelerate.utils.modeling - INFO - We will use 90% of the memory on device 0 for storing the model, and 10% for the buffer to avoid OOM. You can set `max_memory` in to a higher value to use more memory (at your own risk).
+2025-05-08 21:19:20,653 - __main__ - INFO - 教師モデルのロードが完了しました
+2025-05-08 21:19:20,654 - distillation - INFO - トークナイザーのパディング方向を左側に設定します
+2025-05-08 21:19:20,659 - distillation - INFO - RAM使用状況: 30.1% (使用中: 28.7GB, 空き: 66.7GB)
+2025-05-08 21:19:20,786 - __main__ - INFO - 学生モデルを cuda デバイスに明示的に移動しました
+2025-05-08 21:19:20,787 - __main__ - INFO - Generating 5000 distillation examples focusing on: highschool, electronics, it
+2025-05-08 21:19:20,787 - __main__ - INFO - Starting distillation
+2025-05-08 21:19:20,787 - distillation - INFO - Starting distillation process
+2025-05-08 21:19:20,788 - distillation - INFO - Loading data from models\train_data.json
+2025-05-08 21:19:20,791 - distillation - INFO - Loaded 436 examples for distillation
+2025-05-08 21:19:20,791 - distillation - INFO - Loading data from models\val_data.json
+2025-05-08 21:19:20,792 - distillation - INFO - Loaded 43 examples for distillation
+2025-05-08 21:19:20,792 - distillation - INFO - Loaded training dataset with 436 examples
+2025-05-08 21:19:20,792 - distillation - INFO - Loaded validation dataset with 43 examples
+2025-05-08 21:19:20,793 - distillation - INFO - Starting training loop
+2025-05-08 21:19:21,143 - distillation - ERROR - Distillation process failed: expand(torch.cuda.FloatTensor{[2, 1024, 8]}, size=[2, -1]): the number of sizes provided (2) must be greater or equal to the number of dimensions in the tensor (3)
+2025-05-08 21:19:21,150 - distillation - ERROR - Traceback (most recent call last):
+  File "C:\Users\s-rin\Documents\GitHub\lal_v3\brain_model.py", line 238, in forward
+    emotional = self.emotion.process(integrated)
+  File "C:\Users\s-rin\Documents\GitHub\lal_v3\brain_model.py", line 186, in process
+    combined = torch.cat([x, self.emotion_state.expand(x.shape[0], -1)], dim=-1)
+RuntimeError: expand(torch.cuda.FloatTensor{[2, 1024, 8]}, size=[2, -1]): the number of sizes provided (2) must be greater or equal to the number of dimensions in the tensor (3)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\s-rin\Documents\GitHub\lal_v3\distillation.py", line 336, in distill
+    outputs = self.student_model(
+  File "C:\Users\s-rin\AppData\Local\Programs\Python\Python310\lib\site-packages\torch\nn\modules\module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "C:\Users\s-rin\AppData\Local\Programs\Python\Python310\lib\site-packages\torch\nn\modules\module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "C:\Users\s-rin\Documents\GitHub\lal_v3\brain_model.py", line 261, in forward
+    emotional = self.emotion.process(integrated)
+  File "C:\Users\s-rin\Documents\GitHub\lal_v3\brain_model.py", line 186, in process
+    combined = torch.cat([x, self.emotion_state.expand(x.shape[0], -1)], dim=-1)
+RuntimeError: expand(torch.cuda.FloatTensor{[2, 1024, 8]}, size=[2, -1]): the number of sizes provided (2) must be greater or equal to the number of dimensions in the tensor (3)
+
+2025-05-08 21:19:21,151 - __main__ - ERROR - 知識蒸留に失敗しました。モデル保存をスキップします。
+2025-05-08 21:19:21,151 - __main__ - INFO - Saving model in Hugging Face format as lorinta/lal_v3
+2025-05-08 21:19:21,151 - distillation - ERROR - モデルファイルが存在しません: None
+2025-05-08 21:19:21,151 - distillation - INFO - 代わりに現在の学生モデルを保存します
+2025-05-08 21:19:22,913 - distillation - INFO - Model and tokenizer saved in Hugging Face format to models\hf_lal_v3
+2025-05-08 21:19:22,914 - __main__ - INFO - Model successfully saved in Hugging Face format to models\hf_lal_v3
+2025-05-08 21:19:23,089 - __main__ - INFO - ガベージコレクションを実行してメモリを解放しました
+2025-05-08 21:19:23,299 - __main__ - INFO - ガベージコレクションを実行してメモリを解放しました
+2025-05-08 21:26:34,824 - __main__ - INFO - RAM: 使用中 27.3GB / 95.4GB (28.6%)
+2025-05-08 21:26:34,857 - __main__ - INFO - GPU 0 (NVIDIA GeForce RTX 5070 Ti): 確保 0.0GB / 予約 0.0GB / 合計 15.9GB
+2025-05-08 21:26:34,857 - __main__ - INFO - PyTorch nightly版を検出: 2.7.0.dev20250309+cu128
+2025-05-08 21:26:34,858 - __main__ - WARNING - PyTorch nightly版ではGPU最適化ライブラリが使用できない場合があります
+2025-05-08 21:26:34,858 - __main__ - INFO - --use_direct_gpu オプションを使用することを推奨します
+2025-05-08 21:26:38,147 - __main__ - INFO - 重点分野: highschool, electronics, it
+2025-05-08 21:26:38,147 - __main__ - INFO - Using device: cuda
+2025-05-08 21:26:38,147 - __main__ - INFO - GPU: NVIDIA GeForce RTX 5070 Ti
+2025-05-08 21:26:38,147 - __main__ - INFO - CUDA Version: 12.8
+2025-05-08 21:26:38,147 - __main__ - INFO - GPU Memory: 15.9 GB
+2025-05-08 21:26:38,148 - __main__ - INFO - Loading tokenizer for elyza/ELYZA-Thinking-1.0-Qwen-32B
+2025-05-08 21:26:39,122 - __main__ - INFO - 語彙サイズ: 151672
+2025-05-08 21:26:39,122 - __main__ - INFO - Initializing student model
+2025-05-08 21:26:40,482 - distillation - INFO - トークナイザーのパディング方向を左側に設定します
+2025-05-08 21:26:40,482 - distillation - INFO - 教師モデルをスキップするモードで実行しています
+2025-05-08 21:26:40,732 - __main__ - INFO - 学生モデルを cuda デバイスに明示的に移動しました
+2025-05-08 21:26:40,733 - __main__ - INFO - モデルパラメータの整合性をチェックしています...
+2025-05-08 21:26:40,733 - __main__ - INFO - Generating 5000 distillation examples focusing on: highschool, electronics, it
+2025-05-08 21:26:40,734 - __main__ - INFO - Starting distillation
+2025-05-08 21:26:40,734 - distillation - INFO - Starting distillation process
+2025-05-08 21:26:40,734 - distillation - INFO - Loading data from models\train_data.json
+2025-05-08 21:26:40,737 - distillation - INFO - Loaded 436 examples for distillation
+2025-05-08 21:26:40,737 - distillation - INFO - Loading data from models\val_data.json
+2025-05-08 21:26:40,738 - distillation - INFO - Loaded 43 examples for distillation
+2025-05-08 21:26:40,738 - distillation - INFO - Loaded training dataset with 436 examples
+2025-05-08 21:26:40,738 - distillation - INFO - Loaded validation dataset with 43 examples
+2025-05-08 21:26:42,172 - distillation - INFO - Starting training loop
+2025-05-08 21:26:42,644 - distillation - ERROR - Distillation process failed: 'Tensor' object has no attribute 'loss'
+2025-05-08 21:26:42,645 - distillation - ERROR - Traceback (most recent call last):
+  File "C:\Users\s-rin\Documents\GitHub\lal_v3\distillation.py", line 412, in distill
+    loss = outputs.loss / gradient_accumulation_steps
+AttributeError: 'Tensor' object has no attribute 'loss'
+
+2025-05-08 21:26:42,645 - __main__ - ERROR - 知識蒸留に失敗しました。モデル保存をスキップします。
+2025-05-08 21:26:42,646 - __main__ - INFO - Saving model in Hugging Face format as lal-brain-model
+2025-05-08 21:26:42,646 - distillation - ERROR - モデルファイルが存在しません: None
+2025-05-08 21:26:42,646 - distillation - INFO - 代わりに現在の学生モデルを保存します
+2025-05-08 21:26:48,823 - distillation - INFO - Model and tokenizer saved in Hugging Face format to models\hf_lal-brain-model
+2025-05-08 21:26:48,824 - __main__ - INFO - Model successfully saved in Hugging Face format to models\hf_lal-brain-model
+2025-05-08 21:26:48,931 - __main__ - INFO - ガベージコレクションを実行してメモリを解放しました
+2025-05-08 21:26:49,041 - __main__ - INFO - ガベージコレクションを実行してメモリを解放しました
+2025-05-08 21:33:45,426 - __main__ - INFO - RAM: 使用中 27.3GB / 95.4GB (28.6%)
+2025-05-08 21:33:45,458 - __main__ - INFO - GPU 0 (NVIDIA GeForce RTX 5070 Ti): 確保 0.0GB / 予約 0.0GB / 合計 15.9GB
+2025-05-08 21:33:45,458 - __main__ - INFO - PyTorch nightly版を検出: 2.7.0.dev20250309+cu128
+2025-05-08 21:33:45,458 - __main__ - WARNING - PyTorch nightly版ではGPU最適化ライブラリが使用できない場合があります
+2025-05-08 21:33:45,458 - __main__ - INFO - --use_direct_gpu オプションを使用することを推奨します
+2025-05-08 21:33:49,324 - __main__ - INFO - 重点分野: highschool, electronics, it
+2025-05-08 21:33:49,325 - __main__ - INFO - Using device: cuda
+2025-05-08 21:33:49,325 - __main__ - INFO - GPU: NVIDIA GeForce RTX 5070 Ti
+2025-05-08 21:33:49,325 - __main__ - INFO - CUDA Version: 12.8
+2025-05-08 21:33:49,325 - __main__ - INFO - GPU Memory: 15.9 GB
+2025-05-08 21:33:49,325 - __main__ - INFO - Loading tokenizer for elyza/ELYZA-Thinking-1.0-Qwen-32B
+2025-05-08 21:33:50,155 - __main__ - INFO - 語彙サイズ: 151672
+2025-05-08 21:33:50,155 - __main__ - INFO - Initializing student model
+2025-05-08 21:33:50,957 - distillation - INFO - トークナイザーのパディング方向を左側に設定します
+2025-05-08 21:33:50,957 - distillation - INFO - 教師モデルをスキップするモードで実行しています
+2025-05-08 21:33:51,273 - __main__ - INFO - 学生モデルを cuda デバイスに明示的に移動しました
+2025-05-08 21:33:51,274 - __main__ - INFO - モデルパラメータの整合性をチェックしています...
+2025-05-08 21:33:51,274 - __main__ - INFO - Generating 5000 distillation examples focusing on: highschool, electronics, it
+2025-05-08 21:33:51,275 - __main__ - INFO - Starting distillation
+2025-05-08 21:33:51,276 - distillation - INFO - Starting distillation process
+2025-05-08 21:33:51,278 - distillation - INFO - Loading data from models\train_data.json
+2025-05-08 21:33:51,284 - distillation - INFO - Loaded 436 examples for distillation
+2025-05-08 21:33:51,284 - distillation - INFO - Loading data from models\val_data.json
+2025-05-08 21:33:51,285 - distillation - INFO - Loaded 43 examples for distillation
+2025-05-08 21:33:51,285 - distillation - INFO - Loaded training dataset with 436 examples
+2025-05-08 21:33:51,286 - distillation - INFO - Loaded validation dataset with 43 examples
+2025-05-08 21:33:52,653 - distillation - INFO - Starting training loop
+2025-05-08 21:33:53,011 - distillation - ERROR - Distillation process failed: mat1 and mat2 shapes cannot be multiplied (1536x1024 and 768x151672)
+2025-05-08 21:33:53,013 - distillation - ERROR - Traceback (most recent call last):
+  File "C:\Users\s-rin\Documents\GitHub\lal_v3\brain_model.py", line 306, in forward
+    logits = self.output_projection(emotional)
+  File "C:\Users\s-rin\AppData\Local\Programs\Python\Python310\lib\site-packages\torch\nn\modules\module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "C:\Users\s-rin\AppData\Local\Programs\Python\Python310\lib\site-packages\torch\nn\modules\module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "C:\Users\s-rin\AppData\Local\Programs\Python\Python310\lib\site-packages\torch\nn\modules\linear.py", line 125, in forward
+    return F.linear(input, self.weight, self.bias)
+RuntimeError: mat1 and mat2 shapes cannot be multiplied (1536x1024 and 768x151672)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\s-rin\Documents\GitHub\lal_v3\distillation.py", line 406, in distill
+    outputs = self.student_model(
+  File "C:\Users\s-rin\AppData\Local\Programs\Python\Python310\lib\site-packages\torch\nn\modules\module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "C:\Users\s-rin\AppData\Local\Programs\Python\Python310\lib\site-packages\torch\nn\modules\module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "C:\Users\s-rin\Documents\GitHub\lal_v3\brain_model.py", line 334, in forward
+    logits = self.output_projection(emotional)
+  File "C:\Users\s-rin\AppData\Local\Programs\Python\Python310\lib\site-packages\torch\nn\modules\module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "C:\Users\s-rin\AppData\Local\Programs\Python\Python310\lib\site-packages\torch\nn\modules\module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "C:\Users\s-rin\AppData\Local\Programs\Python\Python310\lib\site-packages\torch\nn\modules\linear.py", line 125, in forward
+    return F.linear(input, self.weight, self.bias)
+RuntimeError: mat1 and mat2 shapes cannot be multiplied (1536x1024 and 768x151672)
+
+2025-05-08 21:33:53,014 - __main__ - ERROR - 知識蒸留に失敗しました。モデル保存をスキップします。
+2025-05-08 21:33:53,015 - __main__ - INFO - Saving model in Hugging Face format as lal-brain-model
+2025-05-08 21:33:53,015 - distillation - ERROR - モデルファイルが存在しません: None
+2025-05-08 21:33:53,015 - distillation - INFO - 代わりに現在の学生モデルを保存します
+2025-05-08 21:33:54,334 - distillation - INFO - Model and tokenizer saved in Hugging Face format to models\hf_lal-brain-model
+2025-05-08 21:33:54,335 - __main__ - INFO - Model successfully saved in Hugging Face format to models\hf_lal-brain-model
+2025-05-08 21:33:54,437 - __main__ - INFO - ガベージコレクションを実行してメモリを解放しました
+2025-05-08 21:33:54,536 - __main__ - INFO - ガベージコレクションを実行してメモリを解放しました
+2025-05-08 21:41:21,266 - __main__ - INFO - RAM: 使用中 27.6GB / 95.4GB (28.9%)
+2025-05-08 21:41:21,292 - __main__ - INFO - GPU 0 (NVIDIA GeForce RTX 5070 Ti): 確保 0.0GB / 予約 0.0GB / 合計 15.9GB
+2025-05-08 21:41:21,292 - __main__ - INFO - PyTorch nightly版を検出: 2.7.0.dev20250309+cu128
+2025-05-08 21:41:21,292 - __main__ - WARNING - PyTorch nightly版ではGPU最適化ライブラリが使用できない場合があります
+2025-05-08 21:41:21,293 - __main__ - INFO - --use_direct_gpu オプションを使用することを推奨します
+2025-05-08 21:41:25,198 - __main__ - INFO - 重点分野: highschool, electronics, it
+2025-05-08 21:41:25,198 - __main__ - INFO - Using device: cuda
+2025-05-08 21:41:25,198 - __main__ - INFO - GPU: NVIDIA GeForce RTX 5070 Ti
+2025-05-08 21:41:25,199 - __main__ - INFO - CUDA Version: 12.8
+2025-05-08 21:41:25,199 - __main__ - INFO - GPU Memory: 15.9 GB
+2025-05-08 21:41:25,199 - __main__ - INFO - Loading tokenizer for elyza/ELYZA-Thinking-1.0-Qwen-32B
+2025-05-08 21:41:25,812 - __main__ - INFO - 語彙サイズ: 151672
+2025-05-08 21:41:25,812 - __main__ - INFO - Initializing student model
+2025-05-08 21:41:25,813 - __main__ - ERROR - 学生モデルの初期化に失敗: BrainModel.__init__() got an unexpected keyword argument 'embedding_dim'
+2025-05-08 21:41:25,814 - __main__ - ERROR - Traceback (most recent call last):
+  File "C:\Users\s-rin\Documents\GitHub\lal_v3\main.py", line 326, in load_tokenizer_and_models
+    student_model = BrainModel(
+TypeError: BrainModel.__init__() got an unexpected keyword argument 'embedding_dim'
+
+2025-05-08 21:41:25,814 - __main__ - CRITICAL - 学生モデルが初期化できませんでした。終了します。
+2025-05-08 21:41:25,876 - __main__ - INFO - ガベージコレクションを実行してメモリを解放しました
+2025-05-08 21:42:03,813 - __main__ - INFO - RAM: 使用中 27.4GB / 95.4GB (28.7%)
+2025-05-08 21:42:03,840 - __main__ - INFO - GPU 0 (NVIDIA GeForce RTX 5070 Ti): 確保 0.0GB / 予約 0.0GB / 合計 15.9GB
+2025-05-08 21:42:03,840 - __main__ - INFO - PyTorch nightly版を検出: 2.7.0.dev20250309+cu128
+2025-05-08 21:42:03,840 - __main__ - WARNING - PyTorch nightly版ではGPU最適化ライブラリが使用できない場合があります
+2025-05-08 21:42:03,840 - __main__ - INFO - --use_direct_gpu オプションを使用することを推奨します
+2025-05-08 21:42:05,523 - __main__ - INFO - 重点分野: highschool, electronics, it
+2025-05-08 21:42:05,523 - __main__ - INFO - Using device: cuda
+2025-05-08 21:42:05,524 - __main__ - INFO - GPU: NVIDIA GeForce RTX 5070 Ti
+2025-05-08 21:42:05,524 - __main__ - INFO - CUDA Version: 12.8
+2025-05-08 21:42:05,524 - __main__ - INFO - GPU Memory: 15.9 GB
+2025-05-08 21:42:05,524 - __main__ - INFO - Loading tokenizer for elyza/Llama-3-ELYZA-JP-8B
+2025-05-08 21:42:06,055 - __main__ - INFO - パッドトークンがないため、EOSトークンをパッドトークンとして設定しました
+2025-05-08 21:42:06,074 - __main__ - INFO - 語彙サイズ: 128256
+2025-05-08 21:42:06,074 - __main__ - INFO - Initializing student model
+2025-05-08 21:42:06,074 - __main__ - ERROR - 学生モデルの初期化に失敗: BrainModel.__init__() got an unexpected keyword argument 'embedding_dim'
+2025-05-08 21:42:06,075 - __main__ - ERROR - Traceback (most recent call last):
+  File "C:\Users\s-rin\Documents\GitHub\lal_v3\main.py", line 326, in load_tokenizer_and_models
+    student_model = BrainModel(
+TypeError: BrainModel.__init__() got an unexpected keyword argument 'embedding_dim'
+
+2025-05-08 21:42:06,075 - __main__ - CRITICAL - 学生モデルが初期化できませんでした。終了します。
+2025-05-08 21:42:06,130 - __main__ - INFO - ガベージコレクションを実行してメモリを解放しました
+2025-05-08 21:52:44,583 - __main__ - INFO - RAM: 使用中 27.5GB / 95.4GB (28.8%)
+2025-05-08 21:52:44,616 - __main__ - INFO - GPU 0 (NVIDIA GeForce RTX 5070 Ti): 確保 0.0GB / 予約 0.0GB / 合計 15.9GB
+2025-05-08 21:52:44,616 - __main__ - INFO - PyTorch nightly版を検出: 2.7.0.dev20250309+cu128
+2025-05-08 21:52:44,616 - __main__ - WARNING - PyTorch nightly版ではGPU最適化ライブラリが使用できない場合があります
+2025-05-08 21:52:44,616 - __main__ - INFO - --use_direct_gpu オプションを使用することを推奨します
+2025-05-08 21:52:53,947 - __main__ - INFO - 重点分野: highschool, electronics, it
+2025-05-08 21:52:53,947 - __main__ - INFO - Using device: cuda
+2025-05-08 21:52:53,947 - __main__ - INFO - GPU: NVIDIA GeForce RTX 5070 Ti
+2025-05-08 21:52:53,948 - __main__ - INFO - CUDA Version: 12.8
+2025-05-08 21:52:53,948 - __main__ - INFO - GPU Memory: 15.9 GB
+2025-05-08 21:52:53,948 - __main__ - INFO - Loading tokenizer for elyza/Llama-3-ELYZA-JP-8B
+2025-05-08 21:52:54,469 - __main__ - INFO - パッドトークンがないため、EOSトークンをパッドトークンとして設定しました
+2025-05-08 21:52:54,488 - __main__ - INFO - 語彙サイズ: 128256
+2025-05-08 21:52:54,488 - __main__ - INFO - Initializing student model
+2025-05-08 21:52:54,488 - __main__ - ERROR - 学生モデルの初期化に失敗しました: 'Namespace' object has no attribute 'hidden_size'
+2025-05-08 21:52:54,489 - __main__ - ERROR - Traceback (most recent call last):
+  File "C:\Users\s-rin\Documents\GitHub\lal_v3\main.py", line 327, in load_tokenizer_and_models
+    hidden_size=args.hidden_size,  # hidden_sizeとembedding_dimの両方サポート
+AttributeError: 'Namespace' object has no attribute 'hidden_size'
+
+2025-05-08 21:52:54,549 - __main__ - INFO - ガベージコレクションを実行してメモリを解放しました
+2025-05-08 22:00:46,575 - __main__ - INFO - RAM: 使用中 27.8GB / 95.4GB (29.2%)
+2025-05-08 22:00:46,605 - __main__ - INFO - GPU 0 (NVIDIA GeForce RTX 5070 Ti): 確保 0.0GB / 予約 0.0GB / 合計 15.9GB
+2025-05-08 22:00:46,605 - __main__ - INFO - PyTorch nightly版を検出: 2.7.0.dev20250309+cu128
+2025-05-08 22:00:46,605 - __main__ - WARNING - PyTorch nightly版ではGPU最適化ライブラリが使用できない場合があります
+2025-05-08 22:00:46,606 - __main__ - INFO - --use_direct_gpu オプションを使用することを推奨します
+2025-05-08 22:00:49,634 - __main__ - INFO - 重点分野: highschool, electronics, it
+2025-05-08 22:00:49,640 - memory_utils - INFO - num_layersが指定されていません。デフォルト値を使用: 12
+2025-05-08 22:00:49,641 - memory_utils - INFO - num_headsが指定されていません。デフォルト値を使用: 12
+2025-05-08 22:00:49,641 - memory_utils - INFO - dropoutが指定されていません。デフォルト値を使用: 0.1
+2025-05-08 22:00:49,641 - __main__ - INFO - Using device: cuda
+2025-05-08 22:00:49,641 - __main__ - INFO - GPU: NVIDIA GeForce RTX 5070 Ti
+2025-05-08 22:00:49,642 - __main__ - INFO - CUDA Version: 12.8
+2025-05-08 22:00:49,642 - __main__ - INFO - GPU Memory: 15.9 GB
+2025-05-08 22:00:49,642 - __main__ - INFO - Loading tokenizer for elyza/Llama-3-ELYZA-JP-8B
+2025-05-08 22:00:50,546 - __main__ - INFO - パッドトークンがないため、EOSトークンをパッドトークンとして設定しました
+2025-05-08 22:00:50,572 - __main__ - INFO - 語彙サイズ: 128256
+2025-05-08 22:00:50,573 - __main__ - INFO - モデル設定: hidden_size=768, num_layers=12, num_heads=12
+2025-05-08 22:00:50,573 - __main__ - INFO - Initializing student model
+2025-05-08 22:00:52,041 - __main__ - INFO - Initializing 8-bit quantization
+2025-05-08 22:00:52,041 - __main__ - INFO - Loading teacher model: elyza/Llama-3-ELYZA-JP-8B
+2025-05-08 22:00:57,792 - accelerate.utils.modeling - INFO - We will use 90% of the memory on device 0 for storing the model, and 10% for the buffer to avoid OOM. You can set `max_memory` in to a higher value to use more memory (at your own risk).
+2025-05-08 22:01:06,465 - __main__ - INFO - ガベージコレクションを実行してメモリを解放しました
+2025-05-08 22:01:13,005 - __main__ - INFO - RAM: 使用中 27.8GB / 95.4GB (29.1%)
+2025-05-08 22:01:13,031 - __main__ - INFO - GPU 0 (NVIDIA GeForce RTX 5070 Ti): 確保 0.0GB / 予約 0.0GB / 合計 15.9GB
+2025-05-08 22:01:13,031 - __main__ - INFO - PyTorch nightly版を検出: 2.7.0.dev20250309+cu128
+2025-05-08 22:01:13,031 - __main__ - WARNING - PyTorch nightly版ではGPU最適化ライブラリが使用できない場合があります
+2025-05-08 22:01:13,031 - __main__ - INFO - --use_direct_gpu オプションを使用することを推奨します
+2025-05-08 22:01:14,725 - __main__ - INFO - 重点分野: highschool, electronics, it
+2025-05-08 22:01:14,728 - memory_utils - INFO - num_layersが指定されていません。デフォルト値を使用: 12
+2025-05-08 22:01:14,729 - memory_utils - INFO - num_headsが指定されていません。デフォルト値を使用: 12
+2025-05-08 22:01:14,729 - memory_utils - INFO - dropoutが指定されていません。デフォルト値を使用: 0.1
+2025-05-08 22:01:14,730 - __main__ - INFO - Using device: cuda
+2025-05-08 22:01:14,730 - __main__ - INFO - GPU: NVIDIA GeForce RTX 5070 Ti
+2025-05-08 22:01:14,730 - __main__ - INFO - CUDA Version: 12.8
+2025-05-08 22:01:14,730 - __main__ - INFO - GPU Memory: 15.9 GB
+2025-05-08 22:01:14,730 - __main__ - INFO - Loading tokenizer for elyza/ELYZA-Thinking-1.0-Qwen-32B
+2025-05-08 22:01:15,278 - __main__ - INFO - 語彙サイズ: 151672
+2025-05-08 22:01:15,278 - __main__ - INFO - モデル設定: hidden_size=768, num_layers=12, num_heads=12
+2025-05-08 22:01:15,278 - __main__ - INFO - Initializing student model
+2025-05-08 22:01:16,038 - distillation - INFO - トークナイザーのパディング方向を左側に設定します
+2025-05-08 22:01:16,039 - distillation - INFO - 教師モデルをスキップするモードで実行しています
+2025-05-08 22:01:16,049 - __main__ - INFO - モデル次元情報: vocab_size=151672, hidden_size=768, model_dim=768
+2025-05-08 22:01:16,270 - __main__ - INFO - 学生モデルを cuda デバイスに明示的に移動しました
+2025-05-08 22:01:16,271 - __main__ - INFO - モデルパラメータの整合性をチェックしています...
+2025-05-08 22:01:16,274 - __main__ - INFO - Generating 5000 distillation examples focusing on: highschool, electronics, it
+2025-05-08 22:01:16,275 - __main__ - INFO - Starting distillation
+2025-05-08 22:01:16,275 - distillation - INFO - Starting distillation process
+2025-05-08 22:01:16,277 - distillation - INFO - Loading data from models\train_data.json
+2025-05-08 22:01:16,281 - distillation - INFO - Loaded 436 examples for distillation
+2025-05-08 22:01:16,282 - distillation - INFO - Loading data from models\val_data.json
+2025-05-08 22:01:16,283 - distillation - INFO - Loaded 43 examples for distillation
+2025-05-08 22:01:16,283 - distillation - INFO - Loaded training dataset with 436 examples
+2025-05-08 22:01:16,283 - distillation - INFO - Loaded validation dataset with 43 examples
+2025-05-08 22:01:17,574 - distillation - INFO - Starting training loop
+2025-05-08 22:06:31,202 - distillation - INFO - Epoch: 1/5, Step: 10, Loss: 0.7409
+2025-05-08 22:08:20,953 - distillation - INFO - Epoch 1 completed in 423.38s. Validation Loss: 11.6026
+2025-05-08 22:08:32,409 - distillation - INFO - New best model saved with validation loss: 11.6026
+2025-05-08 22:12:06,082 - distillation - INFO - Epoch: 2/5, Step: 20, Loss: 0.6951
+2025-05-08 22:16:27,088 - distillation - INFO - Epoch 2 completed in 474.68s. Validation Loss: 10.6147
+2025-05-08 22:16:34,488 - distillation - INFO - New best model saved with validation loss: 10.6147
+2025-05-08 22:17:37,961 - distillation - INFO - Epoch: 3/5, Step: 30, Loss: 0.6538
+2025-05-08 22:23:05,011 - distillation - INFO - Epoch: 3/5, Step: 40, Loss: 0.6214
+2025-05-08 22:24:00,073 - distillation - INFO - Epoch 3 completed in 445.59s. Validation Loss: 10.1409
+2025-05-08 22:24:06,125 - distillation - INFO - New best model saved with validation loss: 10.1409
+2025-05-08 22:28:22,697 - distillation - INFO - Epoch: 4/5, Step: 50, Loss: 0.5977
+2025-05-08 22:31:29,933 - distillation - INFO - Epoch 4 completed in 443.81s. Validation Loss: 9.8133
+2025-05-08 22:31:33,692 - distillation - INFO - New best model saved with validation loss: 9.8133
+2025-05-08 22:33:53,194 - distillation - INFO - Epoch: 5/5, Step: 60, Loss: 0.5852
+2025-05-08 22:39:05,013 - distillation - INFO - Epoch: 5/5, Step: 70, Loss: 0.5819
+2025-05-08 22:39:12,175 - distillation - INFO - Epoch 5 completed in 458.48s. Validation Loss: 9.7535
+2025-05-08 22:39:15,880 - distillation - INFO - New best model saved with validation loss: 9.7535
+2025-05-08 22:39:16,934 - distillation - INFO - Training completed. Final model saved to models\brain_model\final_model.pt
+2025-05-08 22:39:16,934 - __main__ - INFO - Loading best model from models\brain_model\final_model.pt
+2025-05-08 22:39:17,605 - __main__ - INFO - モデルのロードが成功しました
+2025-05-08 22:39:17,605 - __main__ - INFO - Saving model in Hugging Face format as lal-brain-model
+2025-05-08 22:39:19,228 - distillation - INFO - Model and tokenizer saved in Hugging Face format to models\hf_lal-brain-model
+2025-05-08 22:39:19,228 - __main__ - INFO - Model successfully saved in Hugging Face format to models\hf_lal-brain-model
+2025-05-08 22:39:22,893 - __main__ - INFO - ガベージコレクションを実行してメモリを解放しました
+2025-05-08 22:39:23,169 - __main__ - INFO - ガベージコレクションを実行してメモリを解放しました
+2025-05-08 22:41:30,275 - __main__ - INFO - RAM: 使用中 14.2GB / 95.4GB (14.8%)
+2025-05-08 22:41:30,294 - __main__ - INFO - GPU 0 (NVIDIA GeForce RTX 5070 Ti): 確保 0.0GB / 予約 0.0GB / 合計 15.9GB
+2025-05-08 22:41:30,295 - __main__ - INFO - PyTorch nightly版を検出: 2.7.0.dev20250309+cu128
+2025-05-08 22:41:30,295 - __main__ - WARNING - PyTorch nightly版ではGPU最適化ライブラリが使用できない場合があります
+2025-05-08 22:41:30,296 - __main__ - INFO - --use_direct_gpu オプションを使用することを推奨します
+2025-05-08 22:41:32,784 - __main__ - INFO - Starting chat mode
+2025-05-08 22:41:33,167 - inference - INFO - Using device: cuda
+2025-05-08 22:41:33,167 - inference - INFO - Loading model from ./models\brain_model\final_model.pt
+2025-05-08 22:41:33,554 - inference - ERROR - Error loading model: BrainModel.__init__() got an unexpected keyword argument 'hidden_dim'
+2025-05-08 22:41:33,554 - __main__ - ERROR - 推論エンジンの初期化に失敗しました: Failed to load model from ./models\brain_model\final_model.pt: BrainModel.__init__() got an unexpected keyword argument 'hidden_dim'
+2025-05-08 22:41:33,625 - __main__ - INFO - ガベージコレクションを実行してメモリを解放しました
+2025-05-08 22:41:51,405 - __main__ - INFO - RAM: 使用中 14.1GB / 95.4GB (14.8%)
+2025-05-08 22:41:51,436 - __main__ - INFO - GPU 0 (NVIDIA GeForce RTX 5070 Ti): 確保 0.0GB / 予約 0.0GB / 合計 15.9GB
+2025-05-08 22:41:51,436 - __main__ - INFO - PyTorch nightly版を検出: 2.7.0.dev20250309+cu128
+2025-05-08 22:41:51,437 - __main__ - WARNING - PyTorch nightly版ではGPU最適化ライブラリが使用できない場合があります
+2025-05-08 22:41:51,437 - __main__ - INFO - --use_direct_gpu オプションを使用することを推奨します
+2025-05-08 22:41:52,697 - __main__ - INFO - Starting chat mode
+2025-05-08 22:41:55,552 - inference - INFO - Using device: cuda
+2025-05-08 22:41:55,552 - inference - INFO - Loading model from models\brain_model\best_model.pt
+2025-05-08 22:41:56,852 - inference - ERROR - Error loading model: BrainModel.__init__() got an unexpected keyword argument 'hidden_dim'
+2025-05-08 22:41:56,853 - __main__ - ERROR - 推論エンジンの初期化に失敗しました: Failed to load model from models\brain_model\best_model.pt: BrainModel.__init__() got an unexpected keyword argument 'hidden_dim'
+2025-05-08 22:41:56,935 - __main__ - INFO - ガベージコレクションを実行してメモリを解放しました
+2025-05-08 22:45:01,935 - __main__ - INFO - RAM: 使用中 14.3GB / 95.4GB (15.0%)
+2025-05-08 22:45:01,956 - __main__ - INFO - GPU 0 (NVIDIA GeForce RTX 5070 Ti): 確保 0.0GB / 予約 0.0GB / 合計 15.9GB
+2025-05-08 22:45:01,956 - __main__ - INFO - PyTorch nightly版を検出: 2.7.0.dev20250309+cu128
+2025-05-08 22:45:01,956 - __main__ - WARNING - PyTorch nightly版ではGPU最適化ライブラリが使用できない場合があります
+2025-05-08 22:45:01,956 - __main__ - INFO - --use_direct_gpu オプションを使用することを推奨します
+2025-05-08 22:45:04,454 - __main__ - INFO - Starting chat mode
+2025-05-08 22:45:07,507 - inference - INFO - Using device: cuda
+2025-05-08 22:45:07,507 - inference - INFO - Loading model from models\brain_model\best_model.pt
+2025-05-08 22:45:07,510 - inference - INFO - Loading model from models\brain_model\best_model.pt
+2025-05-08 22:45:08,885 - inference - ERROR - Error loading model: 'InferenceEngine' object has no attribute 'tokenizer'
+2025-05-08 22:45:08,886 - inference - ERROR - Error loading model: Failed to load model from models\brain_model\best_model.pt: 'InferenceEngine' object has no attribute 'tokenizer'
+2025-05-08 22:45:08,887 - __main__ - ERROR - 推論エンジンの初期化に失敗しました: Failed to load model from models\brain_model\best_model.pt: Failed to load model from models\brain_model\best_model.pt: 'InferenceEngine' object has no attribute 'tokenizer'
+2025-05-08 22:45:08,988 - __main__ - INFO - ガベージコレクションを実行してメモリを解放しました
+2025-05-08 22:49:00,767 - __main__ - INFO - RAM: 使用中 14.3GB / 95.4GB (15.0%)
+2025-05-08 22:49:00,797 - __main__ - INFO - GPU 0 (NVIDIA GeForce RTX 5070 Ti): 確保 0.0GB / 予約 0.0GB / 合計 15.9GB
+2025-05-08 22:49:00,798 - __main__ - INFO - PyTorch nightly版を検出: 2.7.0.dev20250309+cu128
+2025-05-08 22:49:00,798 - __main__ - WARNING - PyTorch nightly版ではGPU最適化ライブラリが使用できない場合があります
+2025-05-08 22:49:00,798 - __main__ - INFO - --use_direct_gpu オプションを使用することを推奨します
+2025-05-08 22:49:02,649 - __main__ - INFO - Starting chat mode
+2025-05-08 22:49:03,020 - inference - INFO - Using device: cuda
+2025-05-08 22:49:03,020 - inference - INFO - Loading tokenizer: elyza/ELYZA-Thinking-1.0-Qwen-32B
+2025-05-08 22:49:03,577 - inference - INFO - Tokenizer loaded successfully with vocab size: 151672
+2025-05-08 22:49:03,577 - inference - INFO - Loading model from ./models\brain_model\final_model.pt
+2025-05-08 22:49:03,578 - inference - INFO - Loading model from ./models\brain_model\final_model.pt
+2025-05-08 22:49:04,930 - inference - ERROR - Error loading model: Error(s) in loading state_dict for BrainModel:
+	size mismatch for embedding.weight: copying a param with shape torch.Size([151672, 768]) from checkpoint, the shape in current model is torch.Size([151643, 768]).
+	size mismatch for output_projection.weight: copying a param with shape torch.Size([151672, 768]) from checkpoint, the shape in current model is torch.Size([151643, 768]).
+	size mismatch for output_projection.bias: copying a param with shape torch.Size([151672]) from checkpoint, the shape in current model is torch.Size([151643]).
+2025-05-08 22:49:04,932 - inference - ERROR - Error loading model: Failed to load model from ./models\brain_model\final_model.pt: Error(s) in loading state_dict for BrainModel:
+	size mismatch for embedding.weight: copying a param with shape torch.Size([151672, 768]) from checkpoint, the shape in current model is torch.Size([151643, 768]).
+	size mismatch for output_projection.weight: copying a param with shape torch.Size([151672, 768]) from checkpoint, the shape in current model is torch.Size([151643, 768]).
+	size mismatch for output_projection.bias: copying a param with shape torch.Size([151672]) from checkpoint, the shape in current model is torch.Size([151643]).
+2025-05-08 22:49:04,933 - __main__ - ERROR - 推論エンジンの初期化に失敗しました: Failed to load model from ./models\brain_model\final_model.pt: Failed to load model from ./models\brain_model\final_model.pt: Error(s) in loading state_dict for BrainModel:
+	size mismatch for embedding.weight: copying a param with shape torch.Size([151672, 768]) from checkpoint, the shape in current model is torch.Size([151643, 768]).
+	size mismatch for output_projection.weight: copying a param with shape torch.Size([151672, 768]) from checkpoint, the shape in current model is torch.Size([151643, 768]).
+	size mismatch for output_projection.bias: copying a param with shape torch.Size([151672]) from checkpoint, the shape in current model is torch.Size([151643]).
+2025-05-08 22:49:05,015 - __main__ - INFO - ガベージコレクションを実行してメモリを解放しました
+2025-05-08 22:53:02,217 - __main__ - INFO - RAM: 使用中 14.4GB / 95.4GB (15.1%)
+2025-05-08 22:53:02,254 - __main__ - INFO - GPU 0 (NVIDIA GeForce RTX 5070 Ti): 確保 0.0GB / 予約 0.0GB / 合計 15.9GB
+2025-05-08 22:53:02,255 - __main__ - INFO - PyTorch nightly版を検出: 2.7.0.dev20250309+cu128
+2025-05-08 22:53:02,255 - __main__ - WARNING - PyTorch nightly版ではGPU最適化ライブラリが使用できない場合があります
+2025-05-08 22:53:02,256 - __main__ - INFO - --use_direct_gpu オプションを使用することを推奨します
+2025-05-08 22:53:12,459 - __main__ - INFO - Starting chat mode
+2025-05-08 22:53:13,021 - inference - INFO - Using device: cuda
+2025-05-08 22:53:13,022 - inference - INFO - Loading tokenizer: elyza/ELYZA-Thinking-1.0-Qwen-32B
+2025-05-08 22:53:13,823 - inference - INFO - Tokenizer loaded successfully with vocab size: 151672
+2025-05-08 22:53:13,823 - inference - INFO - Loading model from ./models\brain_model\final_model.pt
+2025-05-08 22:53:13,824 - inference - INFO - Loading model from ./models\brain_model\final_model.pt
+2025-05-08 22:53:16,214 - inference - INFO - Model loaded successfully
+2025-05-08 22:57:28,926 - __main__ - INFO - ガベージコレクションを実行してメモリを解放しました

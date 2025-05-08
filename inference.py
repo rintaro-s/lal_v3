@@ -53,73 +53,35 @@ class InferenceEngine:
         
         self.logger.info(f"Using device: {self.device}")
         
-        # モデルの読み込み
-        self.logger.info(f"Loading model from {model_path}")
-        try:
-            # Hugging Faceモデルの場合
-            if not os.path.exists(model_path) and '/' in model_path:
-                from huggingface_hub import snapshot_download
-                model_path = snapshot_download(repo_id=model_path)
-                self.logger.info(f"Downloaded model from Hugging Face to {model_path}")
-            
-            if os.path.isdir(model_path):
-                # Hugging Face形式のモデル
-                from transformers import AutoConfig
-                config = AutoConfig.from_pretrained(model_path)
-                self.model = BrainModel(
-                    vocab_size=config.vocab_size,
-                    embedding_dim=config.hidden_size,
-                    hidden_dim=config.intermediate_size,
-                    memory_size=1000  # デフォルト値
-                )
-                self.model.load_state_dict(torch.load(os.path.join(model_path, "pytorch_model.bin")))
-                # 設定ファイルの確認
-                if os.path.exists(os.path.join(model_path, "config.json")):
-                    with open(os.path.join(model_path, "config.json"), "r") as f:
-                        config = json.load(f)
-                        self.imouto_mode = config.get("imouto_mode", False)
-            else:
-                # 通常のPyTorch形式モデル
-                checkpoint = torch.load(model_path, map_location=self.device)
-                
-                # モデルの初期化に必要な情報を取得
-                self.model = BrainModel(
-                    vocab_size=None,  # トークナイザーから取得するため後で設定
-                    embedding_dim=768,
-                    hidden_dim=1024,
-                    memory_size=1000
-                )
-                
-                # モデルの状態を読み込む
-                self.model.load_state_dict(checkpoint['model_state_dict'])
-                self.imouto_mode = checkpoint.get('imouto_mode', False)
-                self.logger.info(f"Model loaded from checkpoint at epoch {checkpoint.get('epoch', 'unknown')}")
-                self.logger.info(f"Imouto mode: {'enabled' if self.imouto_mode else 'disabled'}")
-        except Exception as e:
-            self.logger.error(f"Error loading model: {e}")
-            raise RuntimeError(f"Failed to load model from {model_path}: {e}")
-        
-        # トークナイザーの読み込み
+        # トークナイザーの読み込み - モデル読み込みの前に実行
         self.logger.info(f"Loading tokenizer: {tokenizer_name}")
         try:
             self.tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
             if self.tokenizer.pad_token is None:
                 self.tokenizer.pad_token = self.tokenizer.eos_token
                 
-            # モデルの語彙サイズを設定 (必要な場合)
-            if hasattr(self.model, 'resize_token_embeddings'):
-                self.model.resize_token_embeddings(len(self.tokenizer))
+            self.logger.info(f"Tokenizer loaded successfully with vocab size: {len(self.tokenizer)}")
         except Exception as e:
             self.logger.error(f"Error loading tokenizer: {e}")
             raise RuntimeError(f"Failed to load tokenizer {tokenizer_name}: {e}")
         
-        # モデルをデバイスに移動
-        self.model.to(self.device)
-        self.model.eval()
+        # モデルの読み込み - トークナイザーの後に実行
+        self.logger.info(f"Loading model from {model_path}")
+        try:
+            if not self.load_model(model_path):
+                raise RuntimeError("Model loading failed")
+            self.logger.info("Model loaded successfully")
+        except Exception as e:
+            self.logger.error(f"Error loading model: {e}")
+            raise RuntimeError(f"Failed to load model from {model_path}: {e}")
+            
+        # モデルの語彙サイズを設定 (必要な場合)
+        if hasattr(self.model, 'resize_token_embeddings'):
+            self.model.resize_token_embeddings(len(self.tokenizer))
         
         # メモリシステムの初期化
         try:
-            self.memory_system = MemorySystem(embedding_dim=768)
+            self.memory_system = MemorySystem(embedding_dim=self.model.hidden_size)
         except Exception as e:
             self.logger.error(f"Error initializing memory system: {e}")
             self.logger.warning("Will continue without memory system")
@@ -134,6 +96,28 @@ class InferenceEngine:
         self.output_thread = None
         self.output_queue = queue.Queue()
         self.stop_event = threading.Event()
+    
+    def load_model(self, model_path: str):
+        """モデルを読み込む関数"""
+        try:
+            # 新しいBrainModel.from_pretrainedメソッドを使用
+            self.logger.info(f"Loading model from {model_path}")
+            # トークナイザーの語彙サイズを明示的に渡す
+            vocab_size = len(self.tokenizer) if hasattr(self, 'tokenizer') and self.tokenizer is not None else None
+            
+            # 語彙サイズが不一致でもロードできるように
+            self.model = BrainModel.from_pretrained(
+                model_path,
+                vocab_size=vocab_size
+            )
+            
+            self.model.to(self.device)
+            self.model.eval()
+            return True
+            
+        except Exception as e:
+            self.logger.error(f"Error loading model: {e}")
+            raise ValueError(f"Failed to load model from {model_path}: {e}")
     
     def _output_worker(self, callback: StreamingCallback):
         """出力ワーカースレッド"""

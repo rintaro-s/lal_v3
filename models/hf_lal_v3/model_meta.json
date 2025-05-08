@@ -1,0 +1,34 @@
+{
+  "imouto_mode": true,
+  "focus_subjects": [
+    "highschool",
+    "electronics",
+    "it"
+  ],
+  "model_name": "lorinta/lal_v3",
+  "training_config": {
+    "use_lmstudio": false,
+    "lmstudio_url": "http://localhost:1234/v1",
+    "lmstudio_model": null,
+    "windows_mode": false,
+    "use_cpu_only": false,
+    "use_direct_gpu": false,
+    "use_triton_windows": false,
+    "focus_subjects": [
+      "highschool",
+      "electronics",
+      "it"
+    ],
+    "imouto_mode": true,
+    "use_gguf": false,
+    "gguf_model_path": null,
+    "gguf_context_length": 4096,
+    "thinking_llm": false,
+    "tokenizer_name": "elyza/Llama-3-ELYZA-JP-8B",
+    "max_length": 1024,
+    "num_samples": 5000,
+    "learning_rate": 5e-05,
+    "weight_decay": 0.01,
+    "warmup_steps": 500
+  }
+}

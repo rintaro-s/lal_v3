@@ -1,0 +1,9 @@
+{
+  "model_type": "BrainModel",
+  "hidden_size": 768,
+  "vocab_size": 151672,
+  "num_layers": 12,
+  "num_heads": 12,
+  "output_size": 151672,
+  "dropout": 0.1
+}
