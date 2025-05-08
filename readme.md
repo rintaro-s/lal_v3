@@ -5,7 +5,7 @@
 EN:https://github.com/rintaro-s/lal_v3/blob/main/readme_en.md
 
 
-適当にブランチ作って不定期に更新します
+### 適当にブランチ作って不定期に更新します。
 ## 主な特徴
 
 1. マルチプロセス脳モデル
